@@ -1,26 +1,31 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Vehicle } from '@/lib/data/mock-db';
 import { formatPkr } from '@/lib/utils/format';
 import { Zap, Gauge, Battery, ArrowRight, ShieldCheck, Calendar } from 'lucide-react';
-import VehicleFallbackImage from '@/components/vehicles/VehicleFallbackImage';
 
 interface VehicleCardProps {
   vehicle: Vehicle;
 }
 
 export default function VehicleCard({ vehicle }: VehicleCardProps) {
+  const [imgSrc, setImgSrc] = useState(vehicle.imageUrl || '/images/placeholder-ev.svg');
+
   return (
     <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-blue-500/50 transition-all duration-300 flex flex-col group shadow-sm hover:shadow-md">
       {/* 16:9 Aspect Video Container with Fallback Image */}
       <div className="relative aspect-video w-full overflow-hidden bg-slate-100">
-        <VehicleFallbackImage
-          src={vehicle.imageUrl}
-          alt={`${vehicle.brandName} ${vehicle.name} - Electric Car Pakistan`}
-          brandName={vehicle.brandName}
-          modelName={vehicle.name}
-          bodyType={vehicle.bodyType}
+        <Image
+          src={imgSrc}
+          alt={`${vehicle.brandName || vehicle.brandSlug} ${vehicle.name} - Electric Car Pakistan`}
+          width={600}
+          height={340}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          onError={() => setImgSrc('/images/placeholder-ev.svg')}
+          unoptimized
         />
 
         {/* Top Badges */}

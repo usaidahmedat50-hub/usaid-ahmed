@@ -19,9 +19,18 @@ export default function VehicleImage({
   bodyType = '',
   className = 'w-full h-full object-cover',
 }: VehicleImageProps) {
+  const [imgSrc, setImgSrc] = useState<string>(src || '/images/placeholder-ev.svg');
   const [hasError, setHasError] = useState(false);
 
-  if (hasError || !src) {
+  const handleError = () => {
+    if (imgSrc !== '/images/placeholder-ev.svg') {
+      setImgSrc('/images/placeholder-ev.svg');
+    } else {
+      setHasError(true);
+    }
+  };
+
+  if (hasError) {
     const formattedBrand = brandName.trim();
     const formattedModel = modelName.trim();
     const formattedBody = bodyType.trim();
@@ -52,11 +61,11 @@ export default function VehicleImage({
 
   return (
     <img
-      src={src}
+      src={imgSrc}
       alt={alt}
       className={className}
       loading="lazy"
-      onError={() => setHasError(true)}
+      onError={handleError}
     />
   );
 }

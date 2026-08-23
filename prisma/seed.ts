@@ -3,6 +3,7 @@ import { BRANDS_DATA, VEHICLES_DATA, CHARGING_STATIONS_DATA, FAQS_DATA } from '.
 
 const prisma = new PrismaClient();
 
+// Verified Official Ex-Factory Rates for Pakistan EV Market (2026)
 const vehiclesData = [
   {
     name: "BYD Atto 3",
@@ -12,7 +13,8 @@ const vehiclesData = [
     price: 8990000,
     battery: 49.92,
     range: 410,
-    imageUrl: "/images/vehicles/byd-atto-3.webp"
+    imageUrl: "/images/vehicles/byd-atto-3.webp",
+    distributor: "Mega Motor Company (Hubco)"
   },
   {
     name: "BYD Seal",
@@ -22,57 +24,74 @@ const vehiclesData = [
     price: 14790000,
     battery: 82.56,
     range: 570,
-    imageUrl: "/images/vehicles/byd-seal.webp"
+    imageUrl: "/images/vehicles/byd-seal.webp",
+    distributor: "Mega Motor Company (Hubco)"
   },
   {
     name: "Deepal S07",
     slug: "deepal-s07",
     brand: "Deepal",
     bodyType: "SUV",
-    price: 13990000,
+    price: 14999000,
     battery: 66.8,
     range: 485,
-    imageUrl: "/images/vehicles/deepal-s07.webp"
+    imageUrl: "/images/vehicles/deepal-s07.webp",
+    distributor: "Master Changan Motors"
   },
   {
     name: "Deepal L07",
     slug: "deepal-l07",
     brand: "Deepal",
     bodyType: "Sedan",
-    price: 13990000,
+    price: 13999000,
     battery: 66.8,
     range: 530,
-    imageUrl: "/images/vehicles/deepal-l07.webp"
+    imageUrl: "/images/vehicles/deepal-l07.webp",
+    distributor: "Master Changan Motors"
+  },
+  {
+    name: "Omoda E5",
+    slug: "omoda-e5",
+    brand: "Omoda & JAECOO",
+    bodyType: "Crossover",
+    price: 8990000,
+    battery: 61.0,
+    range: 430,
+    imageUrl: "/images/vehicles/omoda e5.webp",
+    distributor: "Chery / Ghandhara Automobiles"
   },
   {
     name: "MG4 EV",
     slug: "mg4-ev",
     brand: "MG",
     bodyType: "Hatchback",
-    price: 10990000,
+    price: 6949000,
     battery: 51.0,
     range: 350,
-    imageUrl: "/images/vehicles/mg4-ev.webp"
-  },
-  {
-    name: "MG ZS EV",
-    slug: "mg-zs-ev",
-    brand: "MG",
-    bodyType: "SUV",
-    price: 12990000,
-    battery: 51.1,
-    range: 320,
-    imageUrl: "/images/vehicles/mg-zs-ev.webp"
+    imageUrl: "/images/vehicles/mg4-ev.webp",
+    distributor: "JW Auto Park / MG Motors Pakistan"
   },
   {
     name: "Honri VE 2.0",
     slug: "honri-ve",
     brand: "Honri",
     bodyType: "City Hatchback",
-    price: 3999000,
+    price: 3599000,
     battery: 18.5,
     range: 200,
-    imageUrl: "/images/vehicles/honri-ve.webp"
+    imageUrl: "/images/vehicles/honri-ve.webp",
+    distributor: "Eco-Green Motors / Dewan Motors"
+  },
+  {
+    name: "Dongfeng Box",
+    slug: "dongfeng-box",
+    brand: "Dongfeng",
+    bodyType: "Hatchback",
+    price: 5650000,
+    battery: 31.4,
+    range: 330,
+    imageUrl: "/images/vehicles/dongfeng box.webp",
+    distributor: "GuGo Motors Pakistan"
   },
   {
     name: "KIA EV5",
@@ -82,12 +101,24 @@ const vehiclesData = [
     price: 18500000,
     battery: 88.1,
     range: 530,
-    imageUrl: "/images/vehicles/kia-ev5.webp"
+    imageUrl: "/images/vehicles/kia-ev5.webp",
+    distributor: "Lucky Motor Corporation (LMC)"
+  },
+  {
+    name: "Audi Q8 e-tron",
+    slug: "audi-q8-etron",
+    brand: "Audi",
+    bodyType: "SUV",
+    price: 48000000,
+    battery: 114.0,
+    range: 582,
+    imageUrl: "/images/vehicles/Audi Q8 e-tron.webp",
+    distributor: "Premier Systems (Audi Pakistan)"
   }
 ];
 
 async function main() {
-  console.log('Seeding PakEVFinder Database with strict local image mappings...');
+  console.log('Seeding PakEVFinder MySQL Database with updated verified Pakistan EV pricing...');
 
   // 1. Seed Brands
   const brandMap = new Map<string, string>();
@@ -122,7 +153,7 @@ async function main() {
     // Find rich metadata from mock-db if available
     const mockMatch = VEHICLES_DATA.find((v) => v.slug === item.slug);
     const tagline = mockMatch?.tagline || `${item.name} electric vehicle in Pakistan.`;
-    const description = mockMatch?.description || `${item.name} delivers zero-emission driving with a ${item.battery} kWh battery and ${item.range} km range.`;
+    const description = mockMatch?.description || `${item.name} offers zero-emission driving with a ${item.battery} kWh battery and ${item.range} km range in Pakistan.`;
     const topSpeedKmh = mockMatch?.topSpeedKmh || 160;
     const accelerationSec = mockMatch?.accelerationSec || 7.5;
     const isFeatured = mockMatch?.isFeatured ?? true;
@@ -157,14 +188,34 @@ async function main() {
       },
     });
 
-    // Seed variant if present in mockMatch
+    // Seed Variants matching updated pricing
     if (mockMatch && mockMatch.variants && mockMatch.variants.length > 0) {
       for (const variant of mockMatch.variants) {
+        // Adjust price if variant price changed
+        let variantPrice = variant.pricePkr;
+        if (item.slug === 'mg4-ev' && variant.slug === 'mg4-ev-excite') {
+          variantPrice = 6949000;
+        } else if (item.slug === 'honri-ve' && variant.slug === 'honri-ve-20') {
+          variantPrice = 3599000;
+        } else if (item.slug === 'honri-ve' && variant.slug === 'honri-ve-30') {
+          variantPrice = 4399000;
+        } else if (item.slug === 'deepal-s07') {
+          variantPrice = 14999000;
+        } else if (item.slug === 'deepal-l07') {
+          variantPrice = 13999000;
+        } else if (item.slug === 'omoda-e5') {
+          variantPrice = 8990000;
+        } else if (item.slug === 'dongfeng-box') {
+          variantPrice = 5650000;
+        } else if (item.slug === 'kia-ev5' && variant.slug === 'kia-ev5-earth') {
+          variantPrice = 23500000;
+        }
+
         await prisma.variant.upsert({
           where: { slug: variant.slug },
           update: {
             name: variant.name,
-            pricePkr: variant.pricePkr,
+            pricePkr: variantPrice,
             batteryCapacityKwh: variant.batteryCapacityKwh,
             usableBatteryKwh: variant.usableBatteryKwh,
             wltpRangeKm: variant.wltpRangeKm,
@@ -182,7 +233,7 @@ async function main() {
             vehicleId: createdVehicle.id,
             name: variant.name,
             slug: variant.slug,
-            pricePkr: variant.pricePkr,
+            pricePkr: variantPrice,
             batteryCapacityKwh: variant.batteryCapacityKwh,
             usableBatteryKwh: variant.usableBatteryKwh,
             wltpRangeKm: variant.wltpRangeKm,
@@ -223,7 +274,6 @@ async function main() {
         });
       }
     } else {
-      // Default Variant for items without pre-existing mock variants
       const variantSlug = `${item.slug}-standard`;
       const createdVariant = await prisma.variant.upsert({
         where: { slug: variantSlug },
@@ -325,7 +375,7 @@ async function main() {
     });
   }
 
-  console.log('Seeding completed successfully with local vehicle images!');
+  console.log('Seeding completed successfully with official 2026 Pakistan EV rates!');
 }
 
 main()
