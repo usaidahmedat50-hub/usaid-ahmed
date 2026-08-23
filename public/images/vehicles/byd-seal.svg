@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <rect width="800" height="450" fill="#f8fafc"/>
+  <rect x="20" y="20" width="760" height="410" rx="16" fill="#ffffff" stroke="#e2e8f0" stroke-width="2"/>
+  <g transform="translate(220, 110)">
+    <path d="M 10 130 C 50 40 160 30 260 30 C 330 30 370 70 400 130 L 410 145 C 410 155 390 160 370 160 L 20 160 C 0 160 0 145 10 130 Z" fill="#0284c7"/>
+    <path d="M 110 45 L 230 45 L 280 110 L 110 110 Z" fill="#ffffff" opacity="0.85"/>
+    <circle cx="80" cy="160" r="28" fill="#0f172a"/>
+    <circle cx="80" cy="160" r="13" fill="#cbd5e1"/>
+    <circle cx="330" cy="160" r="28" fill="#0f172a"/>
+    <circle cx="330" cy="160" r="13" fill="#cbd5e1"/>
+  </g>
+  <rect x="310" y="40" width="180" height="28" rx="14" fill="#e0f2fe"/>
+  <text x="400" y="59" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="800" fill="#0369a1">BYD SEAL • SEDAN</text>
+  <text x="400" y="340" text-anchor="middle" font-family="system-ui, sans-serif" font-size="24" font-weight="900" fill="#0f172a">BYD Seal</text>
+  <text x="400" y="370" text-anchor="middle" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#059669">61.4 - 82.5 kWh Blade Battery • 0-100 in 3.8s • PKR 14.79M</text>
+</svg>

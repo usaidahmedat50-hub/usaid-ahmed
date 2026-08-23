@@ -1,0 +1,181 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Brand {
+  id                  String     @id @default(uuid())
+  name                String     @unique
+  slug                String     @unique
+  logoUrl             String?
+  country             String
+  officialDistributor String
+  website             String?
+  description         String     @db.Text
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  vehicles            Vehicle[]
+  dealers             Dealer[]
+
+  @@map("brands")
+}
+
+model Vehicle {
+  id               String     @id @default(uuid())
+  brandId          String
+  name             String
+  slug             String     @unique
+  bodyType         String     // SUV, Sedan, Hatchback, Crossover
+  tagline          String?
+  description      String     @db.Text
+  startingPricePkr Float
+  maxRangeKm       Int
+  topSpeedKmh      Int
+  accelerationSec  Float
+  isFeatured       Boolean    @default(false)
+  imageUrl         String?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  brand            Brand      @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  variants         Variant[]
+  priceHistories   PriceHistory[]
+  sources          VehicleSource[]
+
+  @@map("vehicles")
+}
+
+model Variant {
+  id                 String     @id @default(uuid())
+  vehicleId          String
+  name               String
+  slug               String     @unique
+  pricePkr           Float
+  batteryCapacityKwh Float
+  usableBatteryKwh   Float
+  wltpRangeKm        Int?
+  nedcRangeKm        Int?
+  motorPowerHp       Int
+  motorTorqueNm      Int
+  driveType          String     // FWD, RWD, AWD
+  fastChargeKw       Float
+  acChargeKw         Float
+  fastChargeTimeMin  Int
+  acChargeTimeHours  Float
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  vehicle            Vehicle    @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  specification      VehicleSpecification?
+  priceHistories     PriceHistory[]
+
+  @@map("variants")
+}
+
+model VehicleSpecification {
+  id                   String   @id @default(uuid())
+  variantId            String   @unique
+  seatingCapacity      Int
+  groundClearanceMm    Int
+  bootSpaceLiters      Int
+  kerbWeightKg         Int
+  dimensionsMm         String
+  tireSize             String
+  warrantyYears        Int
+  batteryWarrantyYears Int
+  warrantyKm           Int
+  warrantyBatteryKm    Int
+  featuresJson         String   @db.Text // JSON string of features
+
+  variant              Variant  @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@map("vehicle_specifications")
+}
+
+model PriceHistory {
+  id          String   @id @default(uuid())
+  vehicleId   String
+  variantId   String?
+  pricePkr    Float
+  priceType   String   // EX_FACTORY, LISTED, ON_ROAD_ESTIMATE
+  sourceName  String
+  sourceUrl   String?
+  verifiedAt  DateTime @default(now())
+  notes       String?
+
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  variant     Variant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+
+  @@map("price_histories")
+}
+
+model VehicleSource {
+  id              String   @id @default(uuid())
+  vehicleId       String
+  distributorName String
+  isOfficial      Boolean  @default(true)
+  website         String?
+  contactPhone    String?
+  address         String?
+
+  vehicle         Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@map("vehicle_sources")
+}
+
+model ChargingStation {
+  id                String   @id @default(uuid())
+  name              String
+  operator          String   // Hubco, Dewan, ChargeUp, Tesla, KE, etc.
+  city              String   // Karachi, Lahore, Islamabad, Motorway M2, etc.
+  locationName      String
+  latitude          Float
+  longitude         Float
+  address           String
+  totalPorts        Int
+  ccs2Ports         Int
+  gbtPorts          Int
+  type2Ports        Int
+  maxPowerKw        Float
+  isFastCharger     Boolean  @default(true)
+  pricingPerUnitPkr Float?
+  operationalHours  String   @default("24/7")
+  googleMapsUrl     String?
+  createdAt         DateTime @default(now())
+
+  @@map("charging_stations")
+}
+
+model Dealer {
+  id        String   @id @default(uuid())
+  brandId   String
+  name      String
+  city      String
+  address   String
+  phone     String?
+  email     String?
+  is3S      Boolean  @default(true)
+  latitude  Float?
+  longitude Float?
+
+  brand     Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@map("dealers")
+}
+
+model FAQ {
+  id         String   @id @default(uuid())
+  category   String   // EV_BASICS, CHARGING, TAX_POLICY, BRAND
+  question   String
+  answer     String   @db.Text
+  entityType String?  // BRAND, VEHICLE, GENERAL
+  entityId   String?
+  createdAt  DateTime @default(now())
+
+  @@map("faqs")
+}

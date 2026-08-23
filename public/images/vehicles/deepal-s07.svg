@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <rect width="800" height="450" fill="#f8fafc"/>
+  <rect x="20" y="20" width="760" height="410" rx="16" fill="#ffffff" stroke="#e2e8f0" stroke-width="2"/>
+  <g transform="translate(230, 100)">
+    <path d="M 20 130 C 50 40 140 35 240 35 C 310 35 340 75 370 130 L 380 150 L 10 150 Z" fill="#4f46e5"/>
+    <path d="M 120 50 L 220 50 L 260 110 L 120 110 Z" fill="#ffffff" opacity="0.8"/>
+    <circle cx="80" cy="150" r="30" fill="#0f172a"/>
+    <circle cx="80" cy="150" r="14" fill="#cbd5e1"/>
+    <circle cx="310" cy="150" r="30" fill="#0f172a"/>
+    <circle cx="310" cy="150" r="14" fill="#cbd5e1"/>
+  </g>
+  <rect x="310" y="40" width="180" height="28" rx="14" fill="#e0e7ff"/>
+  <text x="400" y="59" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="800" fill="#3730a3">DEEPAL S07 • SUV</text>
+  <text x="400" y="340" text-anchor="middle" font-family="system-ui, sans-serif" font-size="24" font-weight="900" fill="#0f172a">Deepal S07</text>
+  <text x="400" y="370" text-anchor="middle" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#059669">66.8 kWh Battery • 485 km Range • PKR 16.5M</text>
+</svg>
