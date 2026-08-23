@@ -5,6 +5,8 @@ import { Vehicle } from '@/lib/data/mock-db';
 import { formatPkr } from '@/lib/utils/format';
 import { Trophy, X, Plus } from 'lucide-react';
 
+import VehicleImage from '@/components/VehicleImage';
+
 interface ComparisonMatrixProps {
   vehicles: Vehicle[];
   allVehicles: Vehicle[];
@@ -69,9 +71,12 @@ export default function ComparisonMatrix({
                     <X className="w-3.5 h-3.5" />
                   </button>
                   <div className="aspect-video w-full rounded-xl overflow-hidden mb-3 bg-slate-100 border border-slate-200">
-                    <img
+                    <VehicleImage
                       src={v.imageUrl}
                       alt={v.name}
+                      brandName={v.brandName}
+                      modelName={v.name}
+                      bodyType={v.bodyType}
                       className="w-full h-full object-cover"
                     />
                   </div>
