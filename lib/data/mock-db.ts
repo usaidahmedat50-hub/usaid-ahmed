@@ -191,7 +191,7 @@ export const VEHICLES_DATA: Vehicle[] = [
     topSpeedKmh: 160,
     accelerationSec: 7.3,
     isFeatured: true,
-    imageUrl: '/images/vehicles/byd-atto-3.jpg',
+    imageUrl: '/images/vehicles/byd-atto-3.webp',
     distributorName: 'Mega Motor Company (Hubco)',
     distributorIsOfficial: true,
     statusText: 'Officially Available',
