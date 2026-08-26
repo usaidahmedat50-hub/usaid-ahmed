@@ -21,14 +21,20 @@ jobs:
           cache: 'npm'
 
       - name: Install Dependencies
-        run: npm install --include=dev
+        run: npm install --include=dev --legacy-peer-deps
 
       - name: Generate Prisma Client
+        env:
+          DATABASE_URL: "file:./dev.db"
         run: npx prisma generate || true
 
       - name: Build Next.js Application
+        env:
+          DATABASE_URL: "file:./dev.db"
+          NEXT_TELEMETRY_DISABLED: 1
         run: |
           npm run build
+          mkdir -p .next/standalone/.next
           cp -r public .next/standalone/ || true
           cp -r .next/static .next/standalone/.next/ || true
 
@@ -42,4 +48,4 @@ jobs:
           exclude: |
             **/.git*
             **/.git*/**
-            **/node_modules/**
+            **/node_modules/** 
