@@ -25,12 +25,12 @@ jobs:
 
       - name: Generate Prisma Client
         env:
-          DATABASE_URL: "file:./dev.db"
+          DATABASE_URL: "mysql://root:root@localhost:3306/pakevfinder"
         run: npx prisma generate || true
 
       - name: Build Next.js Application
         env:
-          DATABASE_URL: "file:./dev.db"
+          DATABASE_URL: "mysql://root:root@localhost:3306/pakevfinder"
           NEXT_TELEMETRY_DISABLED: 1
         run: |
           npm run build
