@@ -1,0 +1,5 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/pakevfin/repositories/usaidahmed/
+    - /bin/cp -R * $DEPLOYPATH
