@@ -44,8 +44,10 @@ jobs:
           server: ftp.pakevfinder.com
           username: ${{ secrets.CPANEL_FTP_USER }}
           password: ${{ secrets.CPANEL_FTP_PASSWORD }}
-          server-dir: /repositories/usaidahmed/
+          server-dir: ./
+          protocol: ftp
+          dangerous-clean-slate: false
           exclude: |
             **/.git*
             **/.git*/**
-            **/node_modules/** 
+            **/node_modules/**
