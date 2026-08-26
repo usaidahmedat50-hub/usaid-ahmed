@@ -1,4 +1,11 @@
-name: Deploy Next.js to cPanel
+- name: Sync Files to cPanel via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: repositories/usaidahmed/
+          dangerous-clean-slate: falsename: Deploy Next.js to cPanel
 
 on:
   push:
