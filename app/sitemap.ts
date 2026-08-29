@@ -21,6 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/charging-stations/lahore',
     '/charging-stations/islamabad',
     '/charging-stations/m2-motorway',
+    '/plan-a-route',
     '/ev-policy/pakistan',
   ].map((route) => ({
     url: `${baseUrl}${route}`,

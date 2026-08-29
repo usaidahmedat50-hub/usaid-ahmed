@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Zap, ChevronDown, Menu, X, Calculator, MapPin, Compass, FileText, Scale, Search } from 'lucide-react';
+import { Zap, ChevronDown, Menu, X, Calculator, MapPin, Compass, FileText, Scale, Search, Navigation } from 'lucide-react';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -130,6 +130,14 @@ export default function Navbar() {
             </Link>
 
             <Link
+              href="/plan-a-route"
+              className="hover:text-blue-600 transition-colors flex items-center gap-1.5 py-2 text-blue-700 font-extrabold"
+            >
+              <Navigation className="w-4 h-4 text-blue-600" />
+              Route Planner
+            </Link>
+
+            <Link
               href="/ev-policy/pakistan"
               className="hover:text-blue-600 transition-colors flex items-center gap-1.5 py-2"
             >
@@ -218,6 +226,14 @@ export default function Navbar() {
             className="block py-2 text-slate-800 font-bold"
           >
             Charging Stations Map
+          </Link>
+
+          <Link
+            href="/plan-a-route"
+            onClick={() => setIsOpen(false)}
+            className="block py-2 text-blue-700 font-extrabold"
+          >
+            Intercity Route Planner
           </Link>
 
           <Link

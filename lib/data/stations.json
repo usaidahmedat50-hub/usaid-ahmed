@@ -1,0 +1,212 @@
+[
+  {
+    "id": "m2-bhera-north",
+    "name": "M-2 Bhera Service Area (Northbound)",
+    "network": "PSO / Dewan",
+    "city": "Bhera",
+    "address": "M-2 Motorway Northbound, Bhera Service Area, Punjab",
+    "lat": 32.3275,
+    "lng": 72.935,
+    "connectors": [
+      { "type": "CCS2", "count": 2 },
+      { "type": "GB/T", "count": 2 }
+    ],
+    "maxPowerKw": 120,
+    "pricePerKwh": 85,
+    "isMotorway": true,
+    "motorwayName": "M-2",
+    "status": "Operational"
+  },
+  {
+    "id": "m2-bhera-south",
+    "name": "M-2 Bhera Service Area (Southbound)",
+    "network": "PSO / Dewan",
+    "city": "Bhera",
+    "address": "M-2 Motorway Southbound, Bhera Service Area, Punjab",
+    "lat": 32.3241,
+    "lng": 72.9382,
+    "connectors": [
+      { "type": "CCS2", "count": 2 },
+      { "type": "GB/T", "count": 2 }
+    ],
+    "maxPowerKw": 120,
+    "pricePerKwh": 85,
+    "isMotorway": true,
+    "motorwayName": "M-2",
+    "status": "Operational"
+  },
+  {
+    "id": "m2-kallar-kahar",
+    "name": "M-2 Kallar Kahar Salt Range Service Area",
+    "network": "ChargeUp",
+    "city": "Kallar Kahar",
+    "address": "M-2 Motorway Km 235, Salt Range, Punjab",
+    "lat": 32.7812,
+    "lng": 72.7056,
+    "connectors": [
+      { "type": "CCS2", "count": 2 },
+      { "type": "GB/T", "count": 1 }
+    ],
+    "maxPowerKw": 60,
+    "pricePerKwh": 85,
+    "isMotorway": true,
+    "motorwayName": "M-2",
+    "status": "Operational"
+  },
+  {
+    "id": "m2-sukheki",
+    "name": "M-2 Sukheki Service Area",
+    "network": "Hubco EV",
+    "city": "Sukheki",
+    "address": "M-2 Motorway Km 110, Sukheki, Punjab",
+    "lat": 31.8654,
+    "lng": 73.4912,
+    "connectors": [
+      { "type": "CCS2", "count": 2 },
+      { "type": "Type 2", "count": 1 }
+    ],
+    "maxPowerKw": 60,
+    "pricePerKwh": 80,
+    "isMotorway": true,
+    "motorwayName": "M-2",
+    "status": "Operational"
+  },
+  {
+    "id": "m9-nooriabad",
+    "name": "M-9 Nooriabad Service Hub",
+    "network": "KE Charge",
+    "city": "Nooriabad",
+    "address": "M-9 Motorway Km 85, Nooriabad, Sindh",
+    "lat": 25.1489,
+    "lng": 68.0125,
+    "connectors": [
+      { "type": "CCS2", "count": 2 },
+      { "type": "GB/T", "count": 2 }
+    ],
+    "maxPowerKw": 60,
+    "pricePerKwh": 78,
+    "isMotorway": true,
+    "motorwayName": "M-9",
+    "status": "Operational"
+  },
+  {
+    "id": "m5-zahir-pir",
+    "name": "M-5 Zahir Pir Service Area",
+    "network": "PSO / Dewan",
+    "city": "Zahir Pir",
+    "address": "M-5 Multan-Sukkur Motorway, Zahir Pir, Punjab",
+    "lat": 28.8123,
+    "lng": 70.5234,
+    "connectors": [
+      { "type": "CCS2", "count": 2 },
+      { "type": "GB/T", "count": 2 }
+    ],
+    "maxPowerKw": 60,
+    "pricePerKwh": 85,
+    "isMotorway": true,
+    "motorwayName": "M-5",
+    "status": "Operational"
+  },
+  {
+    "id": "khi-clifton-pso",
+    "name": "PSO Super Station Clifton",
+    "network": "PSO Electro",
+    "city": "Karachi",
+    "address": "Block 4, Clifton, Karachi, Sindh",
+    "lat": 24.8214,
+    "lng": 67.0315,
+    "connectors": [
+      { "type": "CCS2", "count": 2 },
+      { "type": "GB/T", "count": 2 }
+    ],
+    "maxPowerKw": 120,
+    "pricePerKwh": 75,
+    "isMotorway": false,
+    "status": "Operational"
+  },
+  {
+    "id": "khi-dha-hubco",
+    "name": "Hubco Mega Charger DHA Phase 8",
+    "network": "Hubco EV",
+    "city": "Karachi",
+    "address": "DHA Phase 8, Karachi, Sindh",
+    "lat": 24.7745,
+    "lng": 67.0782,
+    "connectors": [
+      { "type": "CCS2", "count": 4 },
+      { "type": "Type 2", "count": 2 }
+    ],
+    "maxPowerKw": 160,
+    "pricePerKwh": 80,
+    "isMotorway": false,
+    "status": "Operational"
+  },
+  {
+    "id": "lhe-gulberg-dewan",
+    "name": "Dewan EV Fast Hub Gulberg",
+    "network": "Dewan EV",
+    "city": "Lahore",
+    "address": "Main Boulevard, Gulberg III, Lahore, Punjab",
+    "lat": 31.5102,
+    "lng": 74.3441,
+    "connectors": [
+      { "type": "CCS2", "count": 2 },
+      { "type": "GB/T", "count": 2 }
+    ],
+    "maxPowerKw": 120,
+    "pricePerKwh": 80,
+    "isMotorway": false,
+    "status": "Operational"
+  },
+  {
+    "id": "lhe-dha-chargeup",
+    "name": "ChargeUp Hub DHA Phase 5",
+    "network": "ChargeUp",
+    "city": "Lahore",
+    "address": "CCA Phase 5, DHA, Lahore, Punjab",
+    "lat": 31.4689,
+    "lng": 74.3982,
+    "connectors": [
+      { "type": "CCS2", "count": 2 },
+      { "type": "Type 2", "count": 2 }
+    ],
+    "maxPowerKw": 60,
+    "pricePerKwh": 80,
+    "isMotorway": false,
+    "status": "Operational"
+  },
+  {
+    "id": "isb-f7-pso",
+    "name": "PSO Smart Charger F-7 Markaz",
+    "network": "PSO Electro",
+    "city": "Islamabad",
+    "address": "F-7 Markaz, Islamabad, ICT",
+    "lat": 33.7214,
+    "lng": 73.0568,
+    "connectors": [
+      { "type": "CCS2", "count": 2 },
+      { "type": "GB/T", "count": 2 }
+    ],
+    "maxPowerKw": 120,
+    "pricePerKwh": 82,
+    "isMotorway": false,
+    "status": "Operational"
+  },
+  {
+    "id": "isb-bluearea-tesla",
+    "name": "Blue Area EV Charging Hub",
+    "network": "Tesla Pak / ChargeUp",
+    "city": "Islamabad",
+    "address": "Jinnah Avenue, Blue Area, Islamabad, ICT",
+    "lat": 33.7095,
+    "lng": 73.0642,
+    "connectors": [
+      { "type": "CCS2", "count": 2 },
+      { "type": "Type 2", "count": 2 }
+    ],
+    "maxPowerKw": 60,
+    "pricePerKwh": 80,
+    "isMotorway": false,
+    "status": "Operational"
+  }
+]
