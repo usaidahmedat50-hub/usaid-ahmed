@@ -26,20 +26,26 @@ jobs:
       - name: Build Next.js
         run: npm run build
 
-      - name: Sync Files to cPanel via FTP
+      - name: Prepare Single Deployment Zip
+        run: |
+          mkdir -p upload_stage
+          cp -r .next upload_stage/
+          cp -r public upload_stage/
+          cp package.json upload_stage/
+          cp next.config.* upload_stage/ || true
+          cp server.js upload_stage/ || true
+          cd upload_stage
+          zip -r ../deploy.zip .
+          cd ..
+          mkdir -p deploy_out
+          mv deploy.zip deploy_out/
+
+      - name: Sync Deploy Zip via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_HOST || secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: repositories/usaidahmed/
+          local-dir: ./deploy_out/
           dangerous-clean-slate: false
-          timeout: 600000
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            .next/cache/**
-            src/**
-            app/**
-            components/**
