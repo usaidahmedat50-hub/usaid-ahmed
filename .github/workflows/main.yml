@@ -23,10 +23,10 @@ jobs:
       - name: Install Dependencies
         run: npm ci || npm install
 
-      - name: Build Next.js
+      - name: Build Next.js Production App
         run: npm run build
 
-      - name: Prepare Single Deployment Zip
+      - name: Package Build Artifacts
         run: |
           mkdir -p upload_stage
           cp -r .next upload_stage/
@@ -37,15 +37,14 @@ jobs:
           cd upload_stage
           zip -r ../deploy.zip .
           cd ..
-          mkdir -p deploy_out
-          mv deploy.zip deploy_out/
 
-      - name: Sync Deploy Zip via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - name: Sync Deploy Zip via SFTP
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
-          server: ${{ secrets.FTP_HOST || secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
+          server: ${{ secrets.FTP_HOST || secrets.FTP_SERVER }}
+          ssh_private_key: ''
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: repositories/usaidahmed/
-          local-dir: ./deploy_out/
-          dangerous-clean-slate: false
+          port: 22
+          local_path: './deploy.zip'
+          remote_path: '/home/pakevfin/repositories/usaidahmed/'
