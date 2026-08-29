@@ -34,10 +34,12 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: repositories/usaidahmed/
           dangerous-clean-slate: false
+          timeout: 600000
           exclude: |
             **/.git*
             **/.git*/**
             **/node_modules/**
+            .next/cache/**
             src/**
             app/**
             components/**
