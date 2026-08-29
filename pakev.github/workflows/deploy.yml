@@ -3,7 +3,8 @@ name: Build and Deploy to cPanel
 on:
   push:
     branches:
-      - main  # Change to 'master' if your default branch is master
+      - main
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
@@ -30,20 +31,30 @@ jobs:
       - name: Build Next.js Application
         env:
           DATABASE_URL: "mysql://root:root@localhost:3306/pakevfinder"
-        run: |
-          npm run build
+        run: npm run build
 
+      - name: Prune DevDependencies (Keep Only Production node_modules)
+        run: npm prune --omit=dev
+
+      - name: Bundle Production deploy.zip with node_modules
+        run: |
           cp -r public .next/standalone/ || true
           cp -r .next/static .next/standalone/.next/ || true
+          zip -r deploy.zip .next public package.json next.config.js server.js node_modules prisma .env
+
+      - name: Upload deploy.zip Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-zip
+          path: deploy.zip
 
       - name: Sync Files to cPanel via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ftp.pakevfinder.com
-          username: ${{ secrets.CPANEL_FTP_USER }}
-          password: ${{ secrets.CPANEL_FTP_PASSWORD }}
+          server: ${{ secrets.FTP_SERVER || 'ftp.pakevfinder.com' }}
+          username: ${{ secrets.CPANEL_FTP_USER || secrets.FTP_USERNAME }}
+          password: ${{ secrets.CPANEL_FTP_PASSWORD || secrets.FTP_PASSWORD }}
           server-dir: /repositories/usaidahmed/
           exclude: |
             **/.git*
             **/.git*/**
-            **/node_modules/**
