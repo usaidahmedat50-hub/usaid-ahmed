@@ -54,38 +54,25 @@ jobs:
           zip -r ../release_dist/deploy.zip .
           cd ..
 
-      - name: 🚀 Upload deploy.zip via Python FTP (Adaptive Mode)
+      - name: 🚀 Upload deploy.zip via SSH/SCP
         env:
-          FTP_HOST: ${{ secrets.FTP_HOST || secrets.FTP_SERVER }}
-          FTP_USER: ${{ secrets.FTP_USERNAME }}
-          FTP_PASS: ${{ secrets.FTP_PASSWORD }}
+          SSH_HOST: ${{ secrets.FTP_HOST || secrets.FTP_SERVER }}
+          SSH_USER: ${{ secrets.FTP_USERNAME }}
+          SSH_PASS: ${{ secrets.FTP_PASSWORD }}
         run: |
-          python3 -c '
-          import os, ftplib, sys, time
+          sudo apt-get update && sudo apt-get install -y sshpass
+          
+          SSH_HOST=$(echo "$SSH_HOST" | tr -d '\r\n ')
+          SSH_USER=$(echo "$SSH_USER" | tr -d '\r\n ')
+          SSH_PASS=$(echo "$SSH_PASS" | tr -d '\r\n')
 
-          host = os.environ.get("FTP_HOST", "").strip()
-          user = os.environ.get("FTP_USER", "").strip()
-          password = os.environ.get("FTP_PASS", "").strip()
-          target_dir = "/repositories/usaidahmed"
-          file_path = "release_dist/deploy.zip"
-
-          def upload(pasv_mode):
-              ftp = ftplib.FTP()
-              ftp.connect(host, 21, timeout=60)
-              ftp.login(user, password)
-              ftp.set_pasv(pasv_mode)
-              ftp.cwd(target_dir)
-              mode_name = "Passive" if pasv_mode else "Active"
-              print(f"Attempting upload in {mode_name} mode...")
-              with open(file_path, "rb") as f:
-                  ftp.storbinary("STOR deploy.zip", f, blocksize=256*1024)
-              print(f"Upload successful in {mode_name} mode!")
-              ftp.quit()
-
-          try:
-              upload(True)
-          except Exception as e:
-              print(f"Passive mode failed ({e}), falling back to Active mode...")
-              time.sleep(2)
-              upload(False)
-          '
+          echo "Initiating secure SCP transfer..."
+          sshpass -p "$SSH_PASS" scp -P 22 \
+            -o StrictHostKeyChecking=no \
+            -o UserKnownHostsFile=/dev/null \
+            -o ServerAliveInterval=15 \
+            -o ServerAliveCountMax=6 \
+            -o IPQoS=throughput \
+            release_dist/deploy.zip "$SSH_USER@$SSH_HOST:/repositories/usaidahmed/deploy.zip"
+          
+          echo "Upload complete!"
