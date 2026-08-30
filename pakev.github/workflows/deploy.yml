@@ -36,7 +36,7 @@ jobs:
       - name: 🧹 Prune Dev Dependencies
         run: npm prune --omit=dev
 
-      - name: 🗜️ Package into deploy.zip
+      - name: 🗜️ Package Build Artifacts into deploy.zip
         run: |
           mkdir -p upload_stage
           cp -r .next upload_stage/
@@ -52,13 +52,14 @@ jobs:
           zip -r ../deploy.zip .
           cd ..
 
-      - name: 🚀 Copy deploy.zip to cPanel via SCP
-        uses: appleboy/scp-action@master
+      - name: 🚀 Sync Deploy Zip via SFTP
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
-          host: ${{ secrets.FTP_HOST || secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
+          server: ${{ secrets.FTP_HOST || secrets.FTP_SERVER }}
+          ssh_private_key: ''
           password: ${{ secrets.FTP_PASSWORD }}
           port: 22
-          source: 'deploy.zip'
-          target: '/home/pakevfin/repositories/usaidahmed/'
-          overwrite: true
+          local_path: './deploy.zip'
+          remote_path: '/home/pakevfin/repositories/usaidahmed/'
+          sftp_only: true
