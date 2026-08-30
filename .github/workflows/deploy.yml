@@ -54,7 +54,7 @@ jobs:
           zip -r ../release_dist/deploy.zip .
           cd ..
 
-      - name: 🚀 Upload deploy.zip via Python FTP
+      - name: 🚀 Upload deploy.zip via Python FTP (Sanitized)
         env:
           FTP_HOST: ${{ secrets.FTP_HOST || secrets.FTP_SERVER }}
           FTP_USER: ${{ secrets.FTP_USERNAME }}
@@ -63,13 +63,13 @@ jobs:
           python3 -c '
           import os, ftplib, sys
 
-          host = os.environ.get("FTP_HOST")
-          user = os.environ.get("FTP_USER")
-          password = os.environ.get("FTP_PASS")
+          host = os.environ.get("FTP_HOST", "").strip()
+          user = os.environ.get("FTP_USER", "").strip()
+          password = os.environ.get("FTP_PASS", "").strip()
           target_dir = "/repositories/usaidahmed"
           file_path = "release_dist/deploy.zip"
 
-          print(f"Connecting to FTP host {host}...")
+          print(f"Connecting to FTP host {host} as {user}...")
           ftp = ftplib.FTP(timeout=120)
           ftp.connect(host, 21)
           ftp.login(user, password)
