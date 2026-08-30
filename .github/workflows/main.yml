@@ -54,14 +54,14 @@ jobs:
           zip -r ../release_dist/deploy.zip .
           cd ..
 
-      - name: 🚀 Upload deploy.zip via Python FTP (Sanitized)
+      - name: 🚀 Upload deploy.zip via Python FTP (Adaptive Mode)
         env:
           FTP_HOST: ${{ secrets.FTP_HOST || secrets.FTP_SERVER }}
           FTP_USER: ${{ secrets.FTP_USERNAME }}
           FTP_PASS: ${{ secrets.FTP_PASSWORD }}
         run: |
           python3 -c '
-          import os, ftplib, sys
+          import os, ftplib, sys, time
 
           host = os.environ.get("FTP_HOST", "").strip()
           user = os.environ.get("FTP_USER", "").strip()
@@ -69,19 +69,23 @@ jobs:
           target_dir = "/repositories/usaidahmed"
           file_path = "release_dist/deploy.zip"
 
-          print(f"Connecting to FTP host {host} as {user}...")
-          ftp = ftplib.FTP(timeout=120)
-          ftp.connect(host, 21)
-          ftp.login(user, password)
-          ftp.set_pasv(True)
+          def upload(pasv_mode):
+              ftp = ftplib.FTP()
+              ftp.connect(host, 21, timeout=60)
+              ftp.login(user, password)
+              ftp.set_pasv(pasv_mode)
+              ftp.cwd(target_dir)
+              mode_name = "Passive" if pasv_mode else "Active"
+              print(f"Attempting upload in {mode_name} mode...")
+              with open(file_path, "rb") as f:
+                  ftp.storbinary("STOR deploy.zip", f, blocksize=256*1024)
+              print(f"Upload successful in {mode_name} mode!")
+              ftp.quit()
 
-          print(f"Navigating to {target_dir}...")
-          ftp.cwd(target_dir)
-
-          print("Uploading deploy.zip...")
-          with open(file_path, "rb") as f:
-              ftp.storbinary("STOR deploy.zip", f, blocksize=1024*1024)
-
-          print("Upload complete!")
-          ftp.quit()
+          try:
+              upload(True)
+          except Exception as e:
+              print(f"Passive mode failed ({e}), falling back to Active mode...")
+              time.sleep(2)
+              upload(False)
           '
