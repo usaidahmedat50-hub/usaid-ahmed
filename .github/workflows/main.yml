@@ -1,16 +1,17 @@
-name: Build and Deploy to cPanel
+name: Deploy Next.js to cPanel
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: ⬇️ Checkout Repository
+      - name: ⬇️ Checkout Code
         uses: actions/checkout@v4
 
       - name: ⚙️ Setup Node.js
@@ -20,14 +21,14 @@ jobs:
           cache: 'npm'
 
       - name: 📦 Install Dependencies
-        run: npm ci
+        run: npm ci || npm install
 
       - name: 🔮 Generate Prisma Client
         env:
           DATABASE_URL: "mysql://root:root@localhost:3306/pakevfinder"
         run: npx prisma generate || true
 
-      - name: 🏗️ Build Next.js Application
+      - name: 🏗️ Build Next.js Production App
         env:
           DATABASE_URL: "mysql://root:root@localhost:3306/pakevfinder"
         run: npm run build
@@ -37,15 +38,27 @@ jobs:
 
       - name: 🗜️ Package into deploy.zip
         run: |
-          mkdir -p release
-          zip -r release/deploy.zip .next public package.json server.js node_modules lib types prisma next.config.js -x "*.git*" "*.github*"
+          mkdir -p upload_stage
+          cp -r .next upload_stage/
+          cp -r public upload_stage/
+          cp -r node_modules upload_stage/
+          cp package.json upload_stage/
+          cp next.config.* upload_stage/ || true
+          cp server.js upload_stage/ || true
+          cp -r lib upload_stage/ || true
+          cp -r types upload_stage/ || true
+          cp -r prisma upload_stage/ || true
+          cd upload_stage
+          zip -r ../deploy.zip .
+          cd ..
 
-      - name: 🚀 Upload Single Zip via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - name: 🚀 Copy deploy.zip to cPanel via SCP
+        uses: appleboy/scp-action@master
         with:
-          server: ${{ secrets.FTP_SERVER }}
+          host: ${{ secrets.FTP_HOST || secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./release/
-          server-dir: /repositories/usaidahmed/
-          dangerous-clean-slate: false
+          port: 22
+          source: 'deploy.zip'
+          target: '/home/pakevfin/repositories/usaidahmed/'
+          overwrite: true
