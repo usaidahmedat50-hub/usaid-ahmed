@@ -36,7 +36,7 @@ jobs:
       - name: 🧹 Prune Dev Dependencies
         run: npm prune --omit=dev
 
-      - name: 🗜️ Package into Single deploy.zip
+      - name: 🗜️ Package into deploy.zip
         run: |
           mkdir -p upload_stage
           cp -r .next upload_stage/
@@ -54,14 +54,13 @@ jobs:
           zip -r ../release_dist/deploy.zip .
           cd ..
 
-      - name: 🚀 Upload deploy.zip via Standard FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - name: 🚀 Upload deploy.zip via LFTP
+        uses: mcan/lftp-action@v1.0.0
         with:
-          server: ${{ secrets.FTP_HOST || secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
+          host: ${{ secrets.FTP_HOST || secrets.FTP_SERVER }}
+          user: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          port: 21
-          protocol: ftp
-          local-dir: ./release_dist/
-          server-dir: /repositories/usaidahmed/
-          dangerous-clean-slate: false
+          options: "set ftp:ssl-allow no; set net:timeout 30; set net:max-retries 3;"
+          commands: |
+            cd /repositories/usaidahmed/
+            put release_dist/deploy.zip -o deploy.zip
