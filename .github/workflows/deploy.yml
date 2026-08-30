@@ -1,4 +1,4 @@
-name: Deploy Next.js to cPanel
+name: Build and Deploy to cPanel
 
 on:
   push:
@@ -23,20 +23,13 @@ jobs:
       - name: 📦 Install Dependencies
         run: npm ci || npm install
 
-      - name: 🔮 Generate Prisma Client
-        env:
-          DATABASE_URL: "mysql://root:root@localhost:3306/pakevfinder"
-        run: npx prisma generate || true
-
       - name: 🏗️ Build Next.js Production App
-        env:
-          DATABASE_URL: "mysql://root:root@localhost:3306/pakevfinder"
         run: npm run build
 
       - name: 🧹 Prune Dev Dependencies
         run: npm prune --omit=dev
 
-      - name: 🗜️ Package into deploy.zip
+      - name: 🗜️ Package into Single deploy.zip
         run: |
           mkdir -p upload_stage
           cp -r .next upload_stage/
@@ -47,18 +40,20 @@ jobs:
           cp server.js upload_stage/ || true
           cp -r lib upload_stage/ || true
           cp -r types upload_stage/ || true
-          cp -r prisma upload_stage/ || true
+          
+          mkdir -p dist_deploy
           cd upload_stage
-          zip -r ../deploy.zip .
+          zip -r ../dist_deploy/deploy.zip .
           cd ..
 
-      - name: 🚀 Copy deploy.zip to cPanel via SCP
-        uses: appleboy/scp-action@master
+      - name: 🚀 Upload deploy.zip via Standard FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          host: ${{ secrets.FTP_HOST || secrets.FTP_SERVER }}
+          server: ${{ secrets.FTP_HOST || secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          port: 22
-          source: 'deploy.zip'
-          target: '/home/pakevfin/repositories/usaidahmed/'
-          overwrite: true
+          port: 21
+          protocol: ftp
+          local-dir: ./dist_deploy/
+          server-dir: /repositories/usaidahmed/
+          dangerous-clean-slate: false
