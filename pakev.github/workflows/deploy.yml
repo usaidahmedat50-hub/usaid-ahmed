@@ -54,13 +54,20 @@ jobs:
           zip -r ../release_dist/deploy.zip .
           cd ..
 
-      - name: 🚀 Upload deploy.zip via LFTP
-        uses: mcan/lftp-action@v1.0.0
-        with:
-          host: ${{ secrets.FTP_HOST || secrets.FTP_SERVER }}
-          user: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          options: "set ftp:ssl-allow no; set net:timeout 30; set net:max-retries 3;"
-          commands: |
-            cd /repositories/usaidahmed/
-            put release_dist/deploy.zip -o deploy.zip
+      - name: 🚀 Upload deploy.zip via Native LFTP
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST || secrets.FTP_SERVER }}
+          FTP_USER: ${{ secrets.FTP_USERNAME }}
+          FTP_PASS: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          sudo apt-get update && sudo apt-get install -y lftp
+          lftp -e "
+            set ftp:ssl-allow no;
+            set ftp:passive-mode true;
+            set net:timeout 60;
+            set net:max-retries 3;
+            open -u $FTP_USER,$FTP_PASS $FTP_HOST;
+            cd /repositories/usaidahmed/;
+            put release_dist/deploy.zip -o deploy.zip;
+            bye
+          "
