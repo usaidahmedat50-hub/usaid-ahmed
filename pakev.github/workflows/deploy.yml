@@ -36,7 +36,7 @@ jobs:
       - name: 🧹 Prune Dev Dependencies
         run: npm prune --omit=dev
 
-      - name: 🗜️ Package Build Artifacts into deploy.zip
+      - name: 🗜️ Package into Single deploy.zip
         run: |
           mkdir -p upload_stage
           cp -r .next upload_stage/
@@ -48,18 +48,20 @@ jobs:
           cp -r lib upload_stage/ || true
           cp -r types upload_stage/ || true
           cp -r prisma upload_stage/ || true
+          
+          mkdir -p release_dist
           cd upload_stage
-          zip -r ../deploy.zip .
+          zip -r ../release_dist/deploy.zip .
           cd ..
 
-      - name: 🚀 Sync Deploy Zip via SFTP
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+      - name: 🚀 Upload deploy.zip via Standard FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          username: ${{ secrets.FTP_USERNAME }}
           server: ${{ secrets.FTP_HOST || secrets.FTP_SERVER }}
-          ssh_private_key: ''
+          username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          port: 22
-          local_path: './deploy.zip'
-          remote_path: '/home/pakevfin/repositories/usaidahmed/'
-          sftp_only: true
+          port: 21
+          protocol: ftp
+          local-dir: ./release_dist/
+          server-dir: /repositories/usaidahmed/
+          dangerous-clean-slate: false
