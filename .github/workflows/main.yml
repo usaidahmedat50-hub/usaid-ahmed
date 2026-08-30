@@ -54,20 +54,34 @@ jobs:
           zip -r ../release_dist/deploy.zip .
           cd ..
 
-      - name: 🚀 Upload deploy.zip via LFTP
+      - name: 🚀 Upload deploy.zip via Python FTP
         env:
           FTP_HOST: ${{ secrets.FTP_HOST || secrets.FTP_SERVER }}
           FTP_USER: ${{ secrets.FTP_USERNAME }}
           FTP_PASS: ${{ secrets.FTP_PASSWORD }}
         run: |
-          sudo apt-get update && sudo apt-get install -y lftp
-          lftp <<EOF
-          set ftp:ssl-allow no
-          set ftp:passive-mode true
-          set net:timeout 60
-          set net:max-retries 3
-          open -u "$FTP_USER","$FTP_PASS" "$FTP_HOST"
-          cd /repositories/usaidahmed/
-          put release_dist/deploy.zip -o deploy.zip
-          bye
-          EOF
+          python3 -c '
+          import os, ftplib, sys
+
+          host = os.environ.get("FTP_HOST")
+          user = os.environ.get("FTP_USER")
+          password = os.environ.get("FTP_PASS")
+          target_dir = "/repositories/usaidahmed"
+          file_path = "release_dist/deploy.zip"
+
+          print(f"Connecting to FTP host {host}...")
+          ftp = ftplib.FTP(timeout=120)
+          ftp.connect(host, 21)
+          ftp.login(user, password)
+          ftp.set_pasv(True)
+
+          print(f"Navigating to {target_dir}...")
+          ftp.cwd(target_dir)
+
+          print("Uploading deploy.zip...")
+          with open(file_path, "rb") as f:
+              ftp.storbinary("STOR deploy.zip", f, blocksize=1024*1024)
+
+          print("Upload complete!")
+          ftp.quit()
+          '
