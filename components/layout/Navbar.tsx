@@ -3,44 +3,45 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Zap, Search, ArrowRightLeft, Building2, Compass, BookOpen, Menu, X, ShieldCheck, Calculator } from 'lucide-react';
+import { Zap, Search, ArrowRightLeft, Building2, Compass, BookOpen, Menu, X, ShieldCheck, Calculator, Sparkles } from 'lucide-react';
 
 export default function Navbar() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
-    { name: 'Vehicles', href: '/vehicles', icon: Zap },
+    { name: 'EVs', href: '/vehicles', icon: Zap },
     { name: 'Compare', href: '/compare', icon: ArrowRightLeft },
+    { name: 'Calculators', href: '/calculators/total-cost-of-ownership', icon: Calculator },
+    { name: 'Matchmaker', href: '/find-an-ev', icon: Compass },
+    { name: 'Charging', href: '/charging-stations', icon: ShieldCheck },
     { name: 'Brands', href: '/brands', icon: Building2 },
-    { name: 'Categories', href: '/categories', icon: Compass },
     { name: 'Guides', href: '/articles', icon: BookOpen },
-    { name: 'FAQs', href: '/faq', icon: ShieldCheck },
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/80">
-      {/* Ticker Bar */}
-      <div className="bg-gradient-to-r from-blue-950 via-slate-900 to-emerald-950 border-b border-slate-800/60 text-[11px] font-semibold py-1.5 px-4 text-center text-slate-300 flex items-center justify-center gap-2">
-        <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+    <header className="sticky top-0 z-50 bg-slate-950/85 backdrop-blur-2xl border-b border-slate-800/80">
+      {/* Live Market Ticker */}
+      <div className="bg-gradient-to-r from-blue-950 via-slate-950 to-emerald-950 border-b border-slate-800/60 text-[11px] font-semibold py-1.5 px-4 text-center text-slate-300 flex items-center justify-center gap-2">
+        <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1.5 shadow-sm">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          2026 LIVE DIRECTORY
+          PAKISTAN EV PLATFORM
         </span>
-        <span>Official Distributor Tariffs & Verified Battery Specs for Pakistan</span>
+        <span className="hidden sm:inline">Verified Distributor Tariffs, Battery Specs & 5-Year Ownership Calculators</span>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         {/* Brand Logo */}
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="bg-gradient-to-br from-blue-500 to-emerald-500 p-2 rounded-xl text-white shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform">
+          <div className="bg-gradient-to-br from-blue-500 via-cyan-500 to-emerald-500 p-2.5 rounded-2xl text-white shadow-lg shadow-blue-500/25 group-hover:scale-105 transition-transform duration-300">
             <Zap className="w-5 h-5 fill-current" />
           </div>
           <div className="flex flex-col">
             <span className="text-xl font-black tracking-tight text-white flex items-center gap-1">
-              Pakev<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">Finder</span>
+              PakEV<span className="gradient-text-electric">Finder</span>
             </span>
             <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-400 -mt-1">
-              Automotive Intelligence
+              Find. Compare. Calculate.
             </span>
           </div>
         </Link>
@@ -54,9 +55,9 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                className={`px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                   isActive
-                    ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30'
+                    ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30 shadow-md'
                     : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
                 }`}
               >
@@ -67,26 +68,20 @@ export default function Navbar() {
           })}
         </nav>
 
-        {/* Action Buttons */}
+        {/* CTAs */}
         <div className="flex items-center gap-3">
           <Link
-            href="/admin"
-            className="hidden sm:inline-flex bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-bold px-3.5 py-2 rounded-xl transition-all"
+            href="/find-an-ev"
+            className="hidden sm:inline-flex bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-lg shadow-blue-600/25 transition-all flex items-center gap-1.5"
           >
-            Admin Console
-          </Link>
-          <Link
-            href="/compare"
-            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-lg shadow-blue-600/25 transition-all flex items-center gap-1.5"
-          >
-            <ArrowRightLeft className="w-3.5 h-3.5" />
-            <span>Compare EVs</span>
+            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+            <span>Matchmaker</span>
           </Link>
 
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden bg-slate-800 text-slate-300 p-2 rounded-xl border border-slate-700"
+            className="lg:hidden bg-slate-900 text-slate-300 p-2 rounded-xl border border-slate-800"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>

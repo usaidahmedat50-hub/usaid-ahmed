@@ -4,7 +4,7 @@ import VehicleFallbackImage from './VehicleFallbackImage';
 import { getVerificationBadgeConfig } from '@/lib/data/verification';
 import { calculateVehicleScore } from '@/lib/calculations/scoring';
 import { formatPkr } from '@/lib/utils/format';
-import { Zap, ShieldCheck, Battery, Gauge, ArrowRight, Award } from 'lucide-react';
+import { Zap, ShieldCheck, Battery, Gauge, ArrowRight, Award, Clock } from 'lucide-react';
 
 interface VehicleCardProps {
   vehicle: any;
@@ -27,11 +27,14 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
   });
 
   return (
-    <div className="bg-slate-900/90 border border-slate-800 hover:border-blue-500/50 rounded-3xl p-5 shadow-xl hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 flex flex-col justify-between space-y-4 group">
-      <div className="space-y-3.5">
+    <div className="glass-card rounded-3xl p-5 shadow-2xl transition-all duration-300 flex flex-col justify-between space-y-4 group relative overflow-hidden">
+      {/* Background Accent Glow */}
+      <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/10 blur-3xl rounded-full pointer-events-none group-hover:bg-blue-600/20 transition-all"></div>
+
+      <div className="space-y-3.5 relative z-10">
         {/* Top Badges */}
         <div className="flex justify-between items-center text-xs">
-          <span className="bg-slate-950 border border-slate-800 text-slate-300 font-extrabold px-3 py-1 rounded-full uppercase tracking-wider text-[10px]">
+          <span className="bg-slate-950/80 border border-slate-800 text-slate-300 font-extrabold px-3 py-1 rounded-full uppercase tracking-wider text-[10px]">
             {vehicle.bodyType} • {vehicle.powertrain || 'EV'}
           </span>
           <span className={`text-[10px] font-extrabold px-2.5 py-1 rounded-full border flex items-center gap-1 ${verificationConfig.badgeClass}`}>
@@ -41,7 +44,7 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
         </div>
 
         {/* Image Preview Container */}
-        <div className="aspect-video relative rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 group-hover:border-slate-700 transition-colors">
+        <div className="aspect-video relative rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 group-hover:border-slate-700 transition-colors shadow-inner">
           <VehicleFallbackImage
             src={vehicle.imageUrl}
             alt={vehicle.name}
@@ -52,9 +55,9 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
           />
 
           {/* Value Score Pill */}
-          <div className="absolute bottom-3 left-3 bg-slate-950/80 backdrop-blur-md border border-white/10 px-2.5 py-1 rounded-xl text-[10px] font-extrabold text-blue-400 flex items-center gap-1 shadow-md">
+          <div className="absolute bottom-3 left-3 bg-slate-950/90 backdrop-blur-md border border-white/10 px-2.5 py-1 rounded-xl text-[10px] font-extrabold text-blue-400 flex items-center gap-1 shadow-md">
             <Award className="w-3 h-3 text-emerald-400" />
-            Score {scores.overallScore}/10
+            PakEV Score {scores.overallScore}/10
           </div>
         </div>
 
@@ -66,9 +69,9 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
           </h3>
         </div>
 
-        {/* Specs Metrics */}
+        {/* Key Metrics Grid */}
         <div className="grid grid-cols-2 gap-2 text-xs pt-1">
-          <div className="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 flex items-center gap-2">
+          <div className="bg-slate-950/90 p-2.5 rounded-xl border border-slate-800 flex items-center gap-2">
             <Battery className="w-4 h-4 text-emerald-400 shrink-0" />
             <div>
               <span className="text-[10px] text-slate-400 block font-medium">WLTP Range</span>
@@ -76,7 +79,7 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
             </div>
           </div>
 
-          <div className="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 flex items-center gap-2">
+          <div className="bg-slate-950/90 p-2.5 rounded-xl border border-slate-800 flex items-center gap-2">
             <Zap className="w-4 h-4 text-amber-400 shrink-0" />
             <div>
               <span className="text-[10px] text-slate-400 block font-medium">Battery Pack</span>
@@ -87,10 +90,10 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
       </div>
 
       {/* Footer Pricing & CTA */}
-      <div className="pt-3.5 border-t border-slate-800/80 flex items-center justify-between">
+      <div className="pt-3.5 border-t border-slate-800/80 flex items-center justify-between relative z-10">
         <div>
           <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Ex-Factory Starting</span>
-          <span className="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">
+          <span className="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-emerald-400 to-cyan-400">
             {vehicle.startingPricePkr > 0 ? formatPkr(vehicle.startingPricePkr) : 'Upcoming'}
           </span>
         </div>
