@@ -6,7 +6,7 @@ import VehicleCard from '@/components/vehicles/VehicleCard';
 import AnswerFirstSummary from '@/components/seo/AnswerFirstSummary';
 import { getAllVehicles } from '@/lib/data/mock-db';
 import { formatPkr } from '@/lib/utils/format';
-import { Sparkles, Compass, CheckCircle2, Sliders, ArrowRight } from 'lucide-react';
+import { Sparkles, Compass, CheckCircle2, Sliders, ArrowRight, ShieldCheck } from 'lucide-react';
 
 export default function FindAnEvPage() {
   const allVehicles = getAllVehicles();
@@ -14,40 +14,59 @@ export default function FindAnEvPage() {
   const [budgetMaxPkr, setBudgetMaxPkr] = useState<number>(10000000); // 1 Crore default
   const [selectedBodyType, setSelectedBodyType] = useState<string>('all');
   const [hasHomeCharging, setHasHomeCharging] = useState<boolean>(true);
-  const [selectedCity, setSelectedCity] = useState<string>('lahore');
+  const [primaryDrivingMix, setPrimaryDrivingMix] = useState<string>('city');
 
-  const filteredVehicles = allVehicles.filter((v) => {
-    const matchesBudget = v.startingPricePkr <= budgetMaxPkr || v.startingPricePkr === 0;
-    const matchesBody = selectedBodyType === 'all' || v.bodyType.toLowerCase().includes(selectedBodyType.toLowerCase());
-    return matchesBudget && matchesBody;
-  });
+  // Calculate Percentage Match Score for each vehicle
+  const matchedVehicles = allVehicles.map((v) => {
+    let score = 70; // Base score
+
+    if (v.startingPricePkr <= budgetMaxPkr) score += 15;
+    else score -= 25;
+
+    if (selectedBodyType === 'all' || v.bodyType.toLowerCase().includes(selectedBodyType.toLowerCase())) {
+      score += 10;
+    }
+
+    if (hasHomeCharging && v.maxRangeKm >= 400) score += 5;
+    if (primaryDrivingMix === 'highway' && v.maxRangeKm >= 500) score += 5;
+
+    const matchPercent = Math.min(98, Math.max(45, score));
+
+    return {
+      ...v,
+      matchPercent,
+      matchReason: v.startingPricePkr <= budgetMaxPkr
+        ? 'Fits your exact budget threshold and delivers strong WLTP range efficiency'
+        : 'Slightly above threshold but offers extended battery pack and fast DC charging',
+    };
+  }).sort((a, b) => b.matchPercent - a.matchPercent);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10 text-white">
       <div className="space-y-3">
         <div className="inline-flex items-center gap-2 bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
           <Compass className="w-4 h-4 text-emerald-400" />
-          <span>Interactive Matchmaker</span>
+          <span>Automotive Decision Lab</span>
         </div>
         <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
-          Find the Right EV for Your Budget & Lifestyle
+          Find the Vehicle That Fits Your Life
         </h1>
         <p className="text-slate-300 text-sm max-w-3xl leading-relaxed">
-          Select your budget limit, daily driving habits, and home charging availability to instantly discover electric vehicles matched to your exact requirements in Pakistan.
+          Tell us your budget, driving patterns, and home charging availability. Our recommendation engine scores vehicles based on real-world match parameters.
         </p>
       </div>
 
       <AnswerFirstSummary
-        answer="Finding the right EV in Pakistan depends on budget, home wallbox installation feasibility, and monthly driving mileage. For city commuting under 50 km daily with home charging, compact SUVs and sedans between PKR 6.5M and 11.5M provide optimal value and lowest cost per km."
+        answer="Finding the right EV in Pakistan requires evaluating your budget, home wallbox feasibility, and daily commuting patterns. The PakEVFinder matchmaker ranks vehicles by calculating compatibility scores across budget adherence, range efficiency, and charging infrastructure."
         verifiedDate="Feb 2026"
-        sourceName="PakEVFinder Matchmaker Algorithm"
+        sourceName="PakEVFinder Decision Engine"
       />
 
-      {/* Questionnaire Control Panel */}
-      <div className="bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-3xl space-y-6 shadow-xl">
+      {/* Guided Questionnaire Control Panel */}
+      <div className="editorial-panel p-6 sm:p-8 rounded-3xl space-y-6 shadow-xl">
         <h2 className="text-xl font-bold text-white border-b border-slate-800 pb-3 flex items-center gap-2">
           <Sliders className="w-5 h-5 text-blue-400" />
-          <span>Filter Your Match Parameters</span>
+          <span>Match Parameters</span>
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs font-bold">
@@ -66,10 +85,6 @@ export default function FindAnEvPage() {
               onChange={(e) => setBudgetMaxPkr(Number(e.target.value))}
               className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
             />
-            <div className="flex justify-between text-[10px] text-slate-500">
-              <span>PKR 40 Lakh</span>
-              <span>PKR 3.5 Crore</span>
-            </div>
           </div>
 
           {/* Body Type Filter */}
@@ -87,47 +102,49 @@ export default function FindAnEvPage() {
             </select>
           </div>
 
-          {/* Primary City & Home Charging */}
+          {/* Driving Mix */}
           <div className="space-y-2">
-            <span className="text-slate-300 block">Primary City Location</span>
+            <span className="text-slate-300 block">Primary Driving Pattern</span>
             <select
-              value={selectedCity}
-              onChange={(e) => setSelectedCity(e.target.value)}
+              value={primaryDrivingMix}
+              onChange={(e) => setPrimaryDrivingMix(e.target.value)}
               className="w-full bg-slate-950 border border-slate-800 text-white font-extrabold text-xs rounded-xl p-3 focus:outline-none focus:border-blue-500"
             >
-              <option value="karachi">Karachi (Sindh)</option>
-              <option value="lahore">Lahore (Punjab)</option>
-              <option value="islamabad">Islamabad (Capital Territory)</option>
-              <option value="rawalpindi">Rawalpindi (Punjab)</option>
-              <option value="peshawar">Peshawar (KPK)</option>
-              <option value="multan">Multan (Punjab)</option>
+              <option value="city">City Commuting (Under 60 km daily)</option>
+              <option value="highway">Highway / Intercity Driving (M-2 Travel)</option>
             </select>
           </div>
         </div>
       </div>
 
-      {/* Matched Results Grid */}
+      {/* Ranked Matches Grid */}
       <div className="space-y-6">
         <div className="flex justify-between items-center border-b border-slate-800/80 pb-4">
           <h2 className="text-2xl font-black text-white">
-            Matched Electric Vehicles ({filteredVehicles.length})
+            Top Matched Vehicles ({matchedVehicles.length})
           </h2>
           <span className="text-xs text-slate-400">
-            Showing results under <strong className="text-emerald-400">{formatPkr(budgetMaxPkr)}</strong>
+            Ordered by Percentage Match Score
           </span>
         </div>
 
-        {filteredVehicles.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredVehicles.map((v) => (
-              <VehicleCard key={v.id} vehicle={v} />
-            ))}
-          </div>
-        ) : (
-          <div className="bg-slate-900 border border-slate-800 p-8 rounded-3xl text-center space-y-3">
-            <span className="text-slate-400 text-sm">No vehicles match your strict budget threshold. Try increasing your maximum budget limit above.</span>
-          </div>
-        )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {matchedVehicles.map((v) => (
+            <div key={v.id} className="space-y-2">
+              {/* Match Percentage Banner */}
+              <div className="bg-slate-900 border border-slate-800 p-3 rounded-2xl flex justify-between items-center text-xs">
+                <span className="text-slate-300 font-bold flex items-center gap-1.5">
+                  <Sparkles className="w-4 h-4 text-emerald-400" /> Match Score
+                </span>
+                <span className="bg-emerald-500/20 text-emerald-400 font-black text-xs px-2.5 py-0.5 rounded-full border border-emerald-500/30">
+                  {v.matchPercent}% Match
+                </span>
+              </div>
+
+              <VehicleCard vehicle={v} />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -21,10 +21,10 @@ import {
   Calendar,
   Sparkles,
   ShieldCheck,
-  Plug,
   Award,
   ArrowRight,
-  CheckCircle2,
+  BrainCircuit,
+  Compass,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -67,6 +67,8 @@ export default async function VehicleSlugPage({ params }: VehicleSlugPageProps) 
     batteryWarrantyYears: defaultVariant.batteryWarrantyYears,
   });
 
+  const costPerKmEstimate = Math.round((defaultVariant.batteryCapacityKwh / Math.max(100, vehicle.maxRangeKm)) * 50 * 10) / 10;
+
   const breadcrumbs = [
     { name: 'Home', url: 'https://pakevfinder.com' },
     { name: 'Vehicles', url: 'https://pakevfinder.com/vehicles' },
@@ -83,15 +85,14 @@ export default async function VehicleSlugPage({ params }: VehicleSlugPageProps) 
         ]}
       />
 
-      {/* Main Hero Card */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl">
+      {/* Hero Showcase Card */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center editorial-panel rounded-3xl p-6 sm:p-8 shadow-xl">
         <div className="lg:col-span-7 space-y-5">
           <div className="flex items-center gap-2 flex-wrap text-xs font-bold">
             <span className="bg-slate-950 text-white border border-slate-800 px-3 py-1 rounded-full uppercase tracking-wider text-[10px]">
               {vehicle.bodyType} • {vehicle.powertrain || 'EV'}
             </span>
 
-            {/* Verification Status Badge */}
             <span className={`text-[10px] px-3 py-1 rounded-full border flex items-center gap-1.5 ${verificationConfig.badgeClass}`}>
               <ShieldCheck className="w-3.5 h-3.5" />
               {verificationConfig.label}
@@ -106,7 +107,7 @@ export default async function VehicleSlugPage({ params }: VehicleSlugPageProps) 
           <div>
             <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block">{vehicle.brandName}</span>
             <h1 className="text-3xl sm:text-5xl font-black text-white leading-tight">
-              {vehicle.name} Specs, Price & Range
+              {vehicle.name} Price & Specifications
             </h1>
           </div>
 
@@ -115,9 +116,9 @@ export default async function VehicleSlugPage({ params }: VehicleSlugPageProps) 
           </p>
 
           <div className="pt-2 flex items-baseline gap-3">
-            <span className="text-slate-400 text-xs font-bold">Ex-Factory Price:</span>
-            <span className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">
-              {vehicle.startingPricePkr > 0 ? formatPkr(vehicle.startingPricePkr) : 'Upcoming / Expected'}
+            <span className="text-slate-400 text-xs font-bold">Ex-Factory Starting Price:</span>
+            <span className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-emerald-400 to-cyan-400">
+              {vehicle.startingPricePkr > 0 ? formatPkr(vehicle.startingPricePkr) : 'Upcoming'}
             </span>
           </div>
 
@@ -131,15 +132,15 @@ export default async function VehicleSlugPage({ params }: VehicleSlugPageProps) 
               <span>Compare {vehicle.name}</span>
             </Link>
             <Link
-              href="/compare"
+              href="/find-an-ev"
               className="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs py-3.5 px-6 rounded-xl transition-all border border-slate-700 flex items-center gap-2"
             >
-              Select Competitor
+              Check Compatibility
             </Link>
           </div>
         </div>
 
-        {/* Vehicle Image */}
+        {/* Vehicle Cinematic Image */}
         <div className="lg:col-span-5 relative aspect-video w-full rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 shadow-xl">
           <VehicleFallbackImage
             src={vehicle.imageUrl}
@@ -154,16 +155,54 @@ export default async function VehicleSlugPage({ params }: VehicleSlugPageProps) 
 
       {/* Answer-First Summary (AEO) */}
       <AnswerFirstSummary
-        answer={`The ${vehicle.name} is distributed by ${vehicle.distributorName} in Pakistan starting at ex-factory price ${
+        answer={`The ${vehicle.name} is distributed by ${vehicle.distributorName} in Pakistan at an ex-factory starting price of ${
           vehicle.startingPricePkr > 0 ? formatPkr(vehicle.startingPricePkr) : 'Expected'
-        }. It features a ${defaultVariant.batteryCapacityKwh} kWh battery delivering up to ${
+        }. It features a ${defaultVariant.batteryCapacityKwh} kWh battery pack delivering up to ${
           vehicle.maxRangeKm
         } km WLTP range, ${defaultVariant.motorPowerHp} HP motor output, and ${
           defaultVariant.fastChargeKw
         } kW DC fast charging capabilities.`}
         verifiedDate="Feb 2026"
-        sourceName={`${vehicle.distributorName} Verified Specifications`}
+        sourceName={`${vehicle.distributorName} Verified Specification Filing`}
       />
+
+      {/* PakevFinder Intelligence Insights */}
+      <div className="editorial-panel rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
+        <div className="flex items-center gap-2 border-b border-slate-800 pb-4">
+          <BrainCircuit className="w-6 h-6 text-blue-400" />
+          <h2 className="text-2xl font-black text-white">PakevFinder Intelligence Insights</h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-bold">
+          <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-1">
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Running Cost Rating</span>
+            <span className="text-lg font-black text-emerald-400 block">~PKR {costPerKmEstimate} / KM</span>
+            <p className="text-[11px] text-slate-400 font-normal leading-relaxed">
+              Based on standard 50 PKR/kWh domestic electricity tariff in Pakistan.
+            </p>
+          </div>
+
+          <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-1">
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Market Positioning</span>
+            <span className="text-lg font-black text-blue-400 block">
+              {vehicle.startingPricePkr < 7000000 ? 'Budget Urban EV' : vehicle.startingPricePkr < 12000000 ? 'Mid-Range Crossover' : 'Premium Luxury EV'}
+            </span>
+            <p className="text-[11px] text-slate-400 font-normal leading-relaxed">
+              Competitive pricing relative to imported petrol sedans in Pakistan.
+            </p>
+          </div>
+
+          <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-1">
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Optimal Driving Profile</span>
+            <span className="text-lg font-black text-cyan-400 block">
+              {vehicle.maxRangeKm >= 500 ? 'Intercity & Highway Travel' : 'Daily City Commuting'}
+            </span>
+            <p className="text-[11px] text-slate-400 font-normal leading-relaxed">
+              Suitable for daily commuting and M-2 Motorway journeys between Lahore & Islamabad.
+            </p>
+          </div>
+        </div>
+      </div>
 
       {/* KPI Specs Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -181,9 +220,7 @@ export default async function VehicleSlugPage({ params }: VehicleSlugPageProps) 
 
         <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl text-center shadow-md">
           <Gauge className="w-6 h-6 text-blue-400 mx-auto mb-2" />
-          <span className="text-xl font-black text-white block">
-            {defaultVariant.motorPowerHp} HP
-          </span>
+          <span className="text-xl font-black text-white block">{defaultVariant.motorPowerHp} HP</span>
           <span className="text-xs text-slate-400 font-medium">{defaultVariant.motorTorqueNm} Nm Torque</span>
         </div>
 
@@ -195,11 +232,11 @@ export default async function VehicleSlugPage({ params }: VehicleSlugPageProps) 
       </div>
 
       {/* Value Scoring Breakdown */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
+      <div className="editorial-panel rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
         <div className="flex items-center justify-between border-b border-slate-800 pb-4 flex-wrap gap-4">
           <div className="flex items-center gap-2">
             <Award className="w-6 h-6 text-blue-400" />
-            <h2 className="text-2xl font-bold text-white">PakevFinder Value Score Index</h2>
+            <h2 className="text-2xl font-bold text-white">PakEVFinder Value Score Index</h2>
           </div>
           <span className="bg-gradient-to-r from-blue-600 to-emerald-600 text-white font-black text-lg px-4 py-1.5 rounded-2xl shadow-lg">
             {scores.overallScore} / 10
@@ -220,88 +257,18 @@ export default async function VehicleSlugPage({ params }: VehicleSlugPageProps) 
         </div>
       </div>
 
-      {/* Interactive Range Estimator */}
+      {/* Interactive Calculators */}
       <RangeCalculator
         vehicleName={vehicle.name}
         claimedWltpRangeKm={vehicle.maxRangeKm}
         batteryCapacityKwh={defaultVariant.batteryCapacityKwh}
       />
 
-      {/* Interactive Running Cost Calculator */}
       <VehicleRunningCostCalculator
         vehicleName={vehicle.name}
         batteryCapacityKwh={defaultVariant.batteryCapacityKwh}
         maxRangeKm={vehicle.maxRangeKm}
       />
-
-      {/* Specifications Table */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
-        <div className="flex items-center gap-2 border-b border-slate-800 pb-4">
-          <FileSpreadsheet className="w-6 h-6 text-blue-400" />
-          <h2 className="text-2xl font-bold text-white">Technical Specifications Breakdown</h2>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr className="bg-slate-950 border-b border-slate-800 text-slate-400 uppercase font-bold">
-                <th className="p-4">Spec Feature</th>
-                {vehicle.variants.map((v) => (
-                  <th key={v.id} className="p-4 text-blue-400 font-bold text-sm">
-                    {v.name}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-800 text-slate-200">
-              <tr>
-                <td className="p-4 font-bold text-slate-400 bg-slate-950">Ex-Factory Price</td>
-                {vehicle.variants.map((v) => (
-                  <td key={v.id} className="p-4 font-black text-sm text-emerald-400">
-                    {v.pricePkr > 0 ? formatPkr(v.pricePkr) : 'Expected'}
-                  </td>
-                ))}
-              </tr>
-
-              <tr>
-                <td className="p-4 font-bold text-slate-400 bg-slate-950">Battery Capacity</td>
-                {vehicle.variants.map((v) => (
-                  <td key={v.id} className="p-4 font-medium">
-                    {v.batteryCapacityKwh} kWh Usable
-                  </td>
-                ))}
-              </tr>
-
-              <tr>
-                <td className="p-4 font-bold text-slate-400 bg-slate-950">Claimed Range</td>
-                {vehicle.variants.map((v) => (
-                  <td key={v.id} className="p-4 font-medium">
-                    {v.wltpRangeKm ? `${v.wltpRangeKm} km WLTP` : `${v.nedcRangeKm} km NEDC`}
-                  </td>
-                ))}
-              </tr>
-
-              <tr>
-                <td className="p-4 font-bold text-slate-400 bg-slate-950">Motor Output & Torque</td>
-                {vehicle.variants.map((v) => (
-                  <td key={v.id} className="p-4 font-medium">
-                    {v.motorPowerHp} HP / {v.motorTorqueNm} Nm ({v.driveType})
-                  </td>
-                ))}
-              </tr>
-
-              <tr>
-                <td className="p-4 font-bold text-slate-400 bg-slate-950">Warranty Coverage</td>
-                {vehicle.variants.map((v) => (
-                  <td key={v.id} className="p-4 font-semibold text-emerald-400">
-                    {v.warrantyYears} Years Vehicle / {v.batteryWarrantyYears} Years Battery
-                  </td>
-                ))}
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
   );
 }

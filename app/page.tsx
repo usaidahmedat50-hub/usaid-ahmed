@@ -19,14 +19,14 @@ import {
   ArrowRight,
   TrendingUp,
   Award,
-  Filter,
-  Calculator,
   Compass,
+  Calculator,
+  BrainCircuit,
 } from 'lucide-react';
 
 export const metadata = {
-  title: 'PakEVFinder — Pakistan Electric Vehicle Discovery & Ownership Platform',
-  description: 'Find verified electric car prices, battery capacity, WLTP range, fast charging speeds, 5-year TCO calculators, and side-by-side comparison in Pakistan.',
+  title: 'PakevFinder.com — Pakistan EV & Vehicle Discovery Platform',
+  description: 'Find, compare and decide on electric cars, hybrids, battery capacity, range specs, 5-year TCO calculators, and prices in Pakistan.',
   alternates: {
     canonical: 'https://pakevfinder.com',
   },
@@ -36,7 +36,8 @@ export default function HomePage() {
   const vehicles = getAllVehicles();
   const brands = getAllBrands();
 
-  const featuredVehicles = vehicles.slice(0, 6);
+  const featuredVehicle = vehicles[0]; // BYD Seal (Large Showcase)
+  const secondaryVehicles = vehicles.slice(1, 6);
 
   const breadcrumbs = [{ name: 'Home', url: 'https://pakevfinder.com' }];
 
@@ -49,96 +50,54 @@ export default function HomePage() {
         ]}
       />
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-slate-950 border-b border-slate-800/80 pt-12 pb-20 bg-grid-pattern">
-        {/* Decorative Ambient Lighting */}
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-blue-600/20 blur-[140px] rounded-full pointer-events-none"></div>
-        <div className="absolute top-1/2 right-10 w-[400px] h-[300px] bg-emerald-500/10 blur-[120px] rounded-full pointer-events-none"></div>
-
+      {/* Hero Section — Automotive Discovery Cover */}
+      <section className="relative overflow-hidden bg-slate-950 border-b border-slate-800/80 pt-16 pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 relative z-10">
-          <div className="max-w-4xl space-y-6 text-center mx-auto">
+          <div className="max-w-4xl space-y-6 text-left">
             <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500/10 via-emerald-500/10 to-indigo-500/10 text-blue-400 border border-blue-500/20 text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>Pakistan Electric Vehicle Decision Platform</span>
+              <span>Pakistan Automotive Intelligence & Decision Platform</span>
             </div>
 
             <h1 className="text-4xl sm:text-7xl font-black tracking-tight leading-none text-white">
-              Find the Right <span className="gradient-text-electric">Electric Car.</span>
+              Find your next <span className="gradient-text-electric">vehicle.</span>
             </h1>
 
-            <p className="text-slate-300 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto font-medium">
-              Transparent battery specs, verified distributor prices, real-world WLTP range estimators, and 5-year TCO calculators across all EVs in Pakistan.
+            <p className="text-slate-300 text-base sm:text-lg leading-relaxed max-w-2xl font-medium">
+              Explore, compare and understand the real-world cost of electric cars, hybrids, and new energy vehicles available in Pakistan.
             </p>
           </div>
 
-          {/* Hero Multi-Search Bar */}
-          <div className="glass-panel p-3.5 rounded-3xl border border-white/10 max-w-3xl mx-auto shadow-2xl space-y-3.5">
-            <div className="flex items-center gap-2 bg-slate-950 border border-slate-800 p-2.5 rounded-2xl">
-              <Search className="w-5 h-5 text-blue-400 ml-2 shrink-0" />
+          {/* Prominent Search Bar */}
+          <div className="editorial-panel p-4 rounded-3xl border border-white/10 max-w-3xl shadow-2xl space-y-4">
+            <div className="flex items-center gap-3 bg-slate-950 border border-slate-800 p-3 rounded-2xl">
+              <Search className="w-5 h-5 text-blue-400 shrink-0 ml-1" />
               <input
                 type="text"
-                placeholder="Search BYD Seal, Deepal S07, MG ZS EV, Tesla Model 3..."
-                className="w-full bg-transparent border-none text-white placeholder-slate-500 text-xs sm:text-sm font-medium focus:outline-none focus:ring-0 p-2"
+                placeholder="Search by brand (BYD, MG), model (Seal, S07), or budget..."
+                className="w-full bg-transparent border-none text-white placeholder-slate-500 text-xs sm:text-sm font-bold focus:outline-none focus:ring-0 p-1"
               />
-              <button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold text-xs sm:text-sm px-6 py-3 rounded-xl transition-all shadow-lg shadow-blue-600/25 shrink-0">
-                Search Inventory
+              <button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold text-xs sm:text-sm px-6 py-3 rounded-xl transition-all shadow-lg shadow-blue-600/20 shrink-0">
+                Search
               </button>
             </div>
 
-            {/* Quick Filter Shortcuts */}
-            <div className="flex items-center justify-center gap-2 flex-wrap text-xs font-bold pt-1">
-              <span className="text-slate-400 text-[11px] font-semibold mr-1">Browse:</span>
-              <Link href="/categories/electric-suvs" className="bg-slate-900/80 hover:bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-800 transition-colors">
-                Electric SUVs
+            {/* Quick Discovery Chips */}
+            <div className="flex items-center gap-2 flex-wrap text-xs font-bold pt-1">
+              <span className="text-slate-400 text-[11px] font-semibold mr-1">Quick Discovery:</span>
+              <Link href="/prices/under-5000000" className="bg-slate-900 hover:bg-slate-800 text-slate-300 px-3 py-1.5 rounded-xl border border-slate-800 transition-colors">
+                Under PKR 5M
               </Link>
-              <Link href="/categories/electric-sedans" className="bg-slate-900/80 hover:bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-800 transition-colors">
-                Sedans
+              <Link href="/categories/electric-suvs" className="bg-slate-900 hover:bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-800 transition-colors">
+                Longest Range
               </Link>
-              <Link href="/categories/evs-under-5000000" className="bg-slate-900/80 hover:bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-800 transition-colors">
-                Under 5 Million
+              <Link href="/find-an-ev" className="bg-slate-900 hover:bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-800 transition-colors">
+                Best Value
               </Link>
-              <Link href="/brands/byd" className="bg-slate-900/80 hover:bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-800 transition-colors">
-                BYD
-              </Link>
-              <Link href="/brands/deepal" className="bg-slate-900/80 hover:bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-800 transition-colors">
-                Deepal
+              <Link href="/categories/electric-sedans" className="bg-slate-900 hover:bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-800 transition-colors">
+                City EVs
               </Link>
             </div>
-          </div>
-
-          {/* Quick Tools Ribbon */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto pt-2">
-            <Link href="/find-an-ev" className="glass-card p-4 rounded-2xl flex items-center gap-3 border border-slate-800 hover:border-blue-500/50">
-              <Compass className="w-6 h-6 text-blue-400 shrink-0" />
-              <div>
-                <span className="text-xs font-bold text-white block">EV Matchmaker</span>
-                <span className="text-[10px] text-slate-400">Find by Budget & Needs</span>
-              </div>
-            </Link>
-
-            <Link href="/calculators/ev-vs-petrol" className="glass-card p-4 rounded-2xl flex items-center gap-3 border border-slate-800 hover:border-emerald-500/50">
-              <ArrowRightLeft className="w-6 h-6 text-emerald-400 shrink-0" />
-              <div>
-                <span className="text-xs font-bold text-white block">EV vs Petrol</span>
-                <span className="text-[10px] text-slate-400">Calculate Monthly Fuel Savings</span>
-              </div>
-            </Link>
-
-            <Link href="/compare" className="glass-card p-4 rounded-2xl flex items-center gap-3 border border-slate-800 hover:border-indigo-500/50">
-              <Sparkles className="w-6 h-6 text-indigo-400 shrink-0" />
-              <div>
-                <span className="text-xs font-bold text-white block">Compare EVs</span>
-                <span className="text-[10px] text-slate-400">Side-by-Side Specs</span>
-              </div>
-            </Link>
-
-            <Link href="/calculators/total-cost-of-ownership" className="glass-card p-4 rounded-2xl flex items-center gap-3 border border-slate-800 hover:border-amber-500/50">
-              <Calculator className="w-6 h-6 text-amber-400 shrink-0" />
-              <div>
-                <span className="text-xs font-bold text-white block">TCO Calculator</span>
-                <span className="text-[10px] text-slate-400">3/5/7-Year Ownership</span>
-              </div>
-            </Link>
           </div>
         </div>
       </section>
@@ -146,109 +105,143 @@ export default function HomePage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         {/* Answer-First Summary (AEO) */}
         <AnswerFirstSummary
-          answer={`PakEVFinder is Pakistan's dedicated EV discovery and ownership platform, indexing ${vehicles.length} verified electric, PHEV, and REEV models with transparent technical specs, DC fast charging station maps, 5-year TCO calculators, and historical pricing log archives.`}
+          answer={`PakevFinder is Pakistan's dedicated EV discovery platform, indexing ${vehicles.length} verified electric, PHEV, and REEV models with transparent technical specs, DC fast charging station maps, 5-year TCO calculators, and historical pricing log archives.`}
           verifiedDate="Feb 2026"
-          sourceName="PakEVFinder Automotive Data Verification Engine"
+          sourceName="PakevFinder Data Verification Engine"
         />
 
-        {/* Featured Vehicles Showcase */}
+        {/* Explore By Category Funnel */}
         <section className="space-y-6">
-          <div className="flex justify-between items-end flex-wrap gap-4 border-b border-slate-800/80 pb-4">
-            <div>
-              <div className="flex items-center gap-2 text-xs font-bold text-blue-400 uppercase tracking-wider mb-1">
-                <Zap className="w-4 h-4 text-amber-400" />
-                <span>Popular Electric Lineup</span>
+          <div className="border-b border-slate-800 pb-4">
+            <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+              Explore by Category
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Link href="/vehicles/ev" className="editorial-card p-5 rounded-3xl space-y-2 group">
+              <div className="bg-blue-600/20 text-blue-400 p-2.5 rounded-2xl w-fit">
+                <Zap className="w-5 h-5 fill-current" />
               </div>
+              <h3 className="text-lg font-bold text-white group-hover:text-blue-400 transition-colors">Electric (BEV)</h3>
+              <p className="text-xs text-slate-400">Zero-emission battery electric vehicles</p>
+            </Link>
+
+            <Link href="/vehicles/hybrid" className="editorial-card p-5 rounded-3xl space-y-2 group">
+              <div className="bg-emerald-500/20 text-emerald-400 p-2.5 rounded-2xl w-fit">
+                <Sparkles className="w-5 h-5" />
+              </div>
+              <h3 className="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors">Hybrid (HEV)</h3>
+              <p className="text-xs text-slate-400">Fuel efficiency + electric flexibility</p>
+            </Link>
+
+            <Link href="/vehicles/reev" className="editorial-card p-5 rounded-3xl space-y-2 group">
+              <div className="bg-cyan-500/20 text-cyan-400 p-2.5 rounded-2xl w-fit">
+                <Battery className="w-5 h-5" />
+              </div>
+              <h3 className="text-lg font-bold text-white group-hover:text-cyan-400 transition-colors">Range Extender (REEV)</h3>
+              <p className="text-xs text-slate-400">Electric drive with generator support</p>
+            </Link>
+
+            <Link href="/vehicles/ice" className="editorial-card p-5 rounded-3xl space-y-2 group">
+              <div className="bg-amber-500/20 text-amber-400 p-2.5 rounded-2xl w-fit">
+                <Building2 className="w-5 h-5" />
+              </div>
+              <h3 className="text-lg font-bold text-white group-hover:text-amber-400 transition-colors">Petrol / ICE</h3>
+              <p className="text-xs text-slate-400">Conventional engine benchmark</p>
+            </Link>
+          </div>
+        </section>
+
+        {/* Vehicles Worth Knowing Showcase */}
+        <section className="space-y-6">
+          <div className="flex justify-between items-end flex-wrap gap-4 border-b border-slate-800 pb-4">
+            <div>
+              <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1">Curated Inventory</span>
               <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-                Featured Electric Cars in Pakistan
+                Vehicles Worth Knowing
               </h2>
             </div>
-            <Link
-              href="/vehicles"
-              className="text-xs font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1.5 transition-colors"
-            >
-              <span>Explore All EVs ({vehicles.length})</span>
+            <Link href="/vehicles" className="text-xs font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1.5">
+              <span>View All ({vehicles.length})</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredVehicles.map((v) => (
-              <VehicleCard key={v.id} vehicle={v} />
-            ))}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <VehicleCard vehicle={featuredVehicle} />
+            </div>
+            <div className="space-y-6">
+              {secondaryVehicles.slice(0, 2).map((v) => (
+                <VehicleCard key={v.id} vehicle={v} />
+              ))}
+            </div>
           </div>
         </section>
 
-        {/* Side-by-Side Comparison Engine Banner */}
-        <section className="glass-panel rounded-3xl p-8 space-y-6 relative overflow-hidden border border-slate-800 shadow-2xl">
-          <div className="flex items-center gap-2 text-xs font-bold text-blue-400 uppercase tracking-wider">
-            <Sparkles className="w-4 h-4 text-emerald-400" />
-            <span>Comparison Engine</span>
+        {/* "The Numbers That Matter" Section */}
+        <section className="editorial-panel rounded-3xl p-8 space-y-6 shadow-2xl">
+          <div className="border-b border-slate-800 pb-4">
+            <h2 className="text-2xl font-black text-white">Compare What Actually Matters</h2>
           </div>
 
-          <div className="max-w-2xl space-y-2">
-            <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight">
-              Compare Electric Vehicles Side-by-Side
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div className="space-y-1">
+              <span className="text-3xl sm:text-4xl font-black text-white text-number-display block">PKR 9.49M</span>
+              <span className="text-xs text-slate-400 font-medium">Flagship EV Starting Price</span>
+            </div>
+            <div className="space-y-1">
+              <span className="text-3xl sm:text-4xl font-black text-emerald-400 text-number-display block">570 KM</span>
+              <span className="text-xs text-slate-400 font-medium">Max Claimed WLTP Range</span>
+            </div>
+            <div className="space-y-1">
+              <span className="text-3xl sm:text-4xl font-black text-blue-400 text-number-display block">150 kW</span>
+              <span className="text-xs text-slate-400 font-medium">Peak Fast Charge Power</span>
+            </div>
+            <div className="space-y-1">
+              <span className="text-3xl sm:text-4xl font-black text-amber-400 text-number-display block">3.8 SEC</span>
+              <span className="text-xs text-slate-400 font-medium">0–100 km/h Acceleration</span>
+            </div>
+          </div>
+        </section>
+
+        {/* "Don't Know Which EV to Buy?" Matchmaker CTA */}
+        <section className="editorial-panel rounded-3xl p-8 space-y-4 border border-blue-500/30 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-xs font-bold text-blue-400 uppercase tracking-wider">
+              <BrainCircuit className="w-4 h-4 text-emerald-400" />
+              <span>Decision Support Engine</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-black text-white">
+              Don&apos;t know which EV to buy?
             </h2>
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-medium">
-              Evaluate claimed WLTP range, battery capacity, peak DC fast charging speed, motor horsepower, and 5-year total ownership cost with transparent value scoring.
+            <p className="text-xs sm:text-sm text-slate-300 max-w-xl font-medium">
+              Tell us how you drive, your daily commute, and your budget limit. We&apos;ll narrow down the exact matches for your lifestyle.
             </p>
           </div>
 
-          <div className="pt-2 flex flex-wrap gap-4">
-            <Link
-              href="/compare/byd-seal-vs-tesla-model-3"
-              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold text-xs py-3.5 px-6 rounded-xl transition-all shadow-lg shadow-blue-600/20 flex items-center gap-2"
-            >
-              <span>Compare BYD Seal vs Tesla Model 3</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link
-              href="/compare/byd-atto-3-vs-deepal-s07"
-              className="bg-slate-900 hover:bg-slate-800 text-slate-200 font-bold text-xs py-3.5 px-6 rounded-xl transition-all border border-slate-800 flex items-center gap-2"
-            >
-              <span>BYD Atto 3 vs Deepal S07</span>
-            </Link>
-          </div>
+          <Link
+            href="/find-an-ev"
+            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold text-xs py-3.5 px-6 rounded-xl transition-all shadow-lg shadow-blue-600/20 shrink-0 flex items-center gap-2"
+          >
+            <Sparkles className="w-4 h-4 text-amber-300" />
+            <span>Find My EV</span>
+          </Link>
         </section>
 
-        {/* Interactive Real-World Range Estimator */}
+        {/* Real-World Range & Running Cost Calculators */}
         <RangeCalculator
           vehicleName="BYD Seal"
           claimedWltpRangeKm={570}
           batteryCapacityKwh={82.5}
         />
 
-        {/* Interactive Running Cost Calculator */}
         <VehicleRunningCostCalculator
           vehicleName="BYD Seal"
           batteryCapacityKwh={82.5}
           maxRangeKm={570}
         />
-
-        {/* Distributor Tariff Summary Matrix */}
-        <section className="glass-panel border border-slate-800 rounded-3xl p-8 space-y-6 shadow-2xl">
-          <div className="flex justify-between items-center flex-wrap gap-4 border-b border-slate-800 pb-4">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-emerald-400" />
-              <h2 className="text-2xl font-bold text-white">Verified Distributor Price Matrix</h2>
-            </div>
-            <span className="text-xs text-slate-400 font-medium">Updated Feb 2026</span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            {vehicles.slice(0, 4).map((v) => (
-              <div key={v.id} className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-1">
-                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">{v.brandName}</span>
-                <span className="text-sm font-bold text-white block">{v.name}</span>
-                <span className="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 block">
-                  {v.startingPricePkr > 0 ? formatPkr(v.startingPricePkr) : 'Upcoming'}
-                </span>
-                <span className="text-[10px] text-slate-400 block pt-1">{v.distributorName}</span>
-              </div>
-            ))}
-          </div>
-        </section>
       </div>
     </div>
   );

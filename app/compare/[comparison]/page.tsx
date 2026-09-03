@@ -4,30 +4,24 @@ import AnswerFirstSummary from '@/components/seo/AnswerFirstSummary';
 import SchemaScript, { createBreadcrumbSchema } from '@/components/seo/SchemaScript';
 import VehicleFallbackImage from '@/components/vehicles/VehicleFallbackImage';
 import { getVehicleBySlug, getAllVehicles } from '@/lib/data/mock-db';
-import { compareVehicleScores } from '@/lib/calculations/scoring';
+import { calculateVehicleScore } from '@/lib/calculations/scoring';
 import { formatPkr } from '@/lib/utils/format';
-import { Sparkles, Trophy, ShieldCheck, Zap, Battery, Gauge, Clock, Award } from 'lucide-react';
+import { ArrowRightLeft, CheckCircle2, Award, Zap, Battery, ShieldCheck, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 interface ComparisonPageProps {
   params: Promise<{
-    comparison: string; // e.g. "byd-seal-vs-tesla-model-3"
+    comparison: string;
   }>;
 }
 
 export async function generateStaticParams() {
-  const vehicles = getAllVehicles();
-  const params: { comparison: string }[] = [];
-
-  for (let i = 0; i < Math.min(6, vehicles.length); i++) {
-    for (let j = i + 1; j < Math.min(6, vehicles.length); j++) {
-      params.push({
-        comparison: `${vehicles[i].slug}-vs-${vehicles[j].slug}`,
-      });
-    }
-  }
-
-  return params;
+  return [
+    { comparison: 'byd-seal-vs-tesla-model-3' },
+    { comparison: 'byd-seal-vs-deepal-s07' },
+    { comparison: 'byd-seal-vs-byd-atto-3' },
+    { comparison: 'byd-atto-3-vs-deepal-s07' },
+  ];
 }
 
 export default async function ComparisonPage({ params }: ComparisonPageProps) {
@@ -35,230 +29,169 @@ export default async function ComparisonPage({ params }: ComparisonPageProps) {
   const comparisonSlug = resolvedParams?.comparison || '';
   const parts = comparisonSlug.split('-vs-');
 
-  if (parts.length !== 2) {
+  if (parts.length < 2) {
     notFound();
   }
 
-  const v1 = getVehicleBySlug(parts[0]);
-  const v2 = getVehicleBySlug(parts[1]);
+  const vehicleA = getVehicleBySlug(parts[0]);
+  const vehicleB = getVehicleBySlug(parts[1]);
 
-  if (!v1 || !v2) {
+  if (!vehicleA || !vehicleB) {
     notFound();
   }
 
-  const v1Variant = v1.variants[0];
-  const v2Variant = v2.variants[0];
+  const varA = vehicleA.variants[0];
+  const varB = vehicleB.variants[0];
 
-  const scores = compareVehicleScores(
-    {
-      startingPricePkr: v1.startingPricePkr,
-      maxRangeKm: v1.maxRangeKm,
-      batteryCapacityKwh: v1Variant.batteryCapacityKwh,
-      fastChargeKw: v1Variant.fastChargeKw,
-      motorPowerHp: v1Variant.motorPowerHp,
-      motorTorqueNm: v1Variant.motorTorqueNm,
-      accelerationSec: v1.accelerationSec,
-      warrantyYears: v1Variant.warrantyYears,
-      batteryWarrantyYears: v1Variant.batteryWarrantyYears,
-    },
-    {
-      startingPricePkr: v2.startingPricePkr,
-      maxRangeKm: v2.maxRangeKm,
-      batteryCapacityKwh: v2Variant.batteryCapacityKwh,
-      fastChargeKw: v2Variant.fastChargeKw,
-      motorPowerHp: v2Variant.motorPowerHp,
-      motorTorqueNm: v2Variant.motorTorqueNm,
-      accelerationSec: v2.accelerationSec,
-      warrantyYears: v2Variant.warrantyYears,
-      batteryWarrantyYears: v2Variant.batteryWarrantyYears,
-    }
-  );
+  const scoreA = calculateVehicleScore({
+    startingPricePkr: vehicleA.startingPricePkr,
+    maxRangeKm: vehicleA.maxRangeKm,
+    batteryCapacityKwh: varA.batteryCapacityKwh,
+    fastChargeKw: varA.fastChargeKw,
+    motorPowerHp: varA.motorPowerHp,
+    motorTorqueNm: varA.motorTorqueNm,
+    accelerationSec: vehicleA.accelerationSec,
+    warrantyYears: varA.warrantyYears,
+    batteryWarrantyYears: varA.batteryWarrantyYears,
+  });
 
-  const breadcrumbs = [
-    { name: 'Home', url: 'https://pakevfinder.com' },
-    { name: 'Compare', url: 'https://pakevfinder.com/compare' },
-    {
-      name: `${v1.name} vs ${v2.name}`,
-      url: `https://pakevfinder.com/compare/${comparisonSlug}`,
-    },
-  ];
+  const scoreB = calculateVehicleScore({
+    startingPricePkr: vehicleB.startingPricePkr,
+    maxRangeKm: vehicleB.maxRangeKm,
+    batteryCapacityKwh: varB.batteryCapacityKwh,
+    fastChargeKw: varB.fastChargeKw,
+    motorPowerHp: varB.motorPowerHp,
+    motorTorqueNm: varB.motorTorqueNm,
+    accelerationSec: vehicleB.accelerationSec,
+    warrantyYears: varB.warrantyYears,
+    batteryWarrantyYears: varB.batteryWarrantyYears,
+  });
+
+  const rangeWinner = vehicleA.maxRangeKm >= vehicleB.maxRangeKm ? vehicleA.name : vehicleB.name;
+  const priceWinner = vehicleA.startingPricePkr <= vehicleB.startingPricePkr ? vehicleA.name : vehicleB.name;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
-      <SchemaScript schemaData={createBreadcrumbSchema(breadcrumbs)} />
-
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10 text-white">
       {/* Header */}
-      <div className="text-center space-y-3">
-        <span className="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-          Side-by-Side EV Comparison
-        </span>
-        <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
-          {v1.name} vs {v2.name}
+      <div className="space-y-3">
+        <div className="inline-flex items-center gap-2 bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+          <ArrowRightLeft className="w-4 h-4 text-emerald-400" />
+          <span>Side-by-Side Comparison Engine</span>
+        </div>
+        <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
+          {vehicleA.brandName} {vehicleA.name} vs {vehicleB.brandName} {vehicleB.name}
         </h1>
-        <p className="text-slate-600 text-sm max-w-2xl mx-auto">
-          Detailed price, battery, range, charging power, and performance comparison.
+        <p className="text-slate-300 text-sm max-w-3xl leading-relaxed">
+          Compare ex-factory prices, battery capacity, WLTP range, fast charging speeds, motor horsepower, and PakEV Value Scores in Pakistan.
         </p>
       </div>
 
-      <AnswerFirstSummary
-        answer={`${v1.name} (${formatPkr(v1.startingPricePkr)}, ${v1.maxRangeKm} km range) vs ${
-          v2.name
-        } (${formatPkr(v2.startingPricePkr)}, ${v2.maxRangeKm} km range). ${
-          scores.winnerOverall === 1 ? v1.name : v2.name
-        } achieves a higher overall PakevFinder Value Score.`}
-        verifiedDate="Feb 2026"
-        sourceName="PakevFinder Comparison Calculation Module"
-      />
-
-      {/* Vehicles Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Vehicle 1 Card */}
-        <div className="bg-white border-2 border-slate-200 rounded-3xl p-6 space-y-4 shadow-sm relative overflow-hidden">
-          {scores.winnerOverall === 1 && (
-            <div className="absolute top-4 right-4 bg-emerald-500 text-white text-[10px] font-bold px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
-              <Trophy className="w-3.5 h-3.5" /> Higher Value Score
-            </div>
-          )}
-
-          <div className="aspect-video relative rounded-2xl overflow-hidden bg-slate-100 border border-slate-200">
+      {/* Side-by-Side Vehicle Showcases */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Vehicle A Card */}
+        <div className="editorial-panel rounded-3xl p-6 space-y-4 shadow-xl">
+          <div className="aspect-video relative rounded-2xl overflow-hidden bg-slate-950 border border-slate-800">
             <VehicleFallbackImage
-              src={v1.imageUrl}
-              alt={v1.name}
-              brandName={v1.brandName}
-              modelName={v1.name}
-              bodyType={v1.bodyType}
+              src={vehicleA.imageUrl}
+              alt={vehicleA.name}
+              brandName={vehicleA.brandName}
+              modelName={vehicleA.name}
+              bodyType={vehicleA.bodyType}
               className="w-full h-full object-cover"
             />
           </div>
-
           <div>
-            <h2 className="text-2xl font-black text-slate-900">{v1.name}</h2>
-            <span className="text-2xl font-bold text-blue-700 block">
-              {v1.startingPricePkr > 0 ? formatPkr(v1.startingPricePkr) : 'Expected'}
+            <span className="text-xs text-slate-400 font-bold uppercase">{vehicleA.brandName}</span>
+            <h2 className="text-2xl font-black text-white">{vehicleA.name}</h2>
+            <span className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 block pt-1">
+              {formatPkr(vehicleA.startingPricePkr)}
             </span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
-              <span className="text-slate-400 block">WLTP Range</span>
-              <span className="font-bold text-slate-900">{v1.maxRangeKm} km</span>
-            </div>
-            <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
-              <span className="text-slate-400 block">Battery Size</span>
-              <span className="font-bold text-slate-900">{v1Variant.batteryCapacityKwh} kWh</span>
-            </div>
           </div>
         </div>
 
-        {/* Vehicle 2 Card */}
-        <div className="bg-white border-2 border-slate-200 rounded-3xl p-6 space-y-4 shadow-sm relative overflow-hidden">
-          {scores.winnerOverall === 2 && (
-            <div className="absolute top-4 right-4 bg-emerald-500 text-white text-[10px] font-bold px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
-              <Trophy className="w-3.5 h-3.5" /> Higher Value Score
-            </div>
-          )}
-
-          <div className="aspect-video relative rounded-2xl overflow-hidden bg-slate-100 border border-slate-200">
+        {/* Vehicle B Card */}
+        <div className="editorial-panel rounded-3xl p-6 space-y-4 shadow-xl">
+          <div className="aspect-video relative rounded-2xl overflow-hidden bg-slate-950 border border-slate-800">
             <VehicleFallbackImage
-              src={v2.imageUrl}
-              alt={v2.name}
-              brandName={v2.brandName}
-              modelName={v2.name}
-              bodyType={v2.bodyType}
+              src={vehicleB.imageUrl}
+              alt={vehicleB.name}
+              brandName={vehicleB.brandName}
+              modelName={vehicleB.name}
+              bodyType={vehicleB.bodyType}
               className="w-full h-full object-cover"
             />
           </div>
-
           <div>
-            <h2 className="text-2xl font-black text-slate-900">{v2.name}</h2>
-            <span className="text-2xl font-bold text-blue-700 block">
-              {v2.startingPricePkr > 0 ? formatPkr(v2.startingPricePkr) : 'Expected'}
+            <span className="text-xs text-slate-400 font-bold uppercase">{vehicleB.brandName}</span>
+            <h2 className="text-2xl font-black text-white">{vehicleB.name}</h2>
+            <span className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 block pt-1">
+              {formatPkr(vehicleB.startingPricePkr)}
             </span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
-              <span className="text-slate-400 block">WLTP Range</span>
-              <span className="font-bold text-slate-900">{v2.maxRangeKm} km</span>
-            </div>
-            <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
-              <span className="text-slate-400 block">Battery Size</span>
-              <span className="font-bold text-slate-900">{v2Variant.batteryCapacityKwh} kWh</span>
-            </div>
           </div>
         </div>
       </div>
 
-      {/* Side-by-Side Comparison Matrix */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm">
-        <h2 className="text-2xl font-bold text-slate-900">Direct Category Comparison</h2>
+      {/* Factual Verdict Summary Block */}
+      <AnswerFirstSummary
+        answer={`In this comparison between ${vehicleA.name} and ${vehicleB.name}, the ${rangeWinner} offers superior driving range (${Math.max(vehicleA.maxRangeKm, vehicleB.maxRangeKm)} km WLTP), while the ${priceWinner} delivers the lower starting price point (${formatPkr(Math.min(vehicleA.startingPricePkr, vehicleB.startingPricePkr))}).`}
+        verifiedDate="Feb 2026"
+        sourceName="PakEVFinder Comparison Engine"
+      />
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr className="bg-slate-50 border-b border-slate-200 text-slate-700 uppercase font-bold">
-                <th className="p-4">Feature Category</th>
-                <th className="p-4 text-blue-700 font-bold">{v1.name}</th>
-                <th className="p-4 text-blue-700 font-bold">{v2.name}</th>
-                <th className="p-4 text-emerald-700 font-bold">Category Advantage</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 text-slate-800">
-              <tr>
-                <td className="p-4 font-bold text-slate-700 bg-slate-50">Ex-Factory Price</td>
-                <td className="p-4 font-bold">{formatPkr(v1.startingPricePkr)}</td>
-                <td className="p-4 font-bold">{formatPkr(v2.startingPricePkr)}</td>
-                <td className="p-4 font-bold text-emerald-700">
-                  {v1.startingPricePkr <= v2.startingPricePkr ? v1.name : v2.name}
-                </td>
-              </tr>
+      {/* Where Each Vehicle Wins Breakdown */}
+      <div className="editorial-panel rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
+        <h2 className="text-2xl font-black text-white border-b border-slate-800 pb-4">
+          Where Each Vehicle Wins
+        </h2>
 
-              <tr>
-                <td className="p-4 font-bold text-slate-700 bg-slate-50">Claimed WLTP Range</td>
-                <td className="p-4 font-bold">{v1.maxRangeKm} km</td>
-                <td className="p-4 font-bold">{v2.maxRangeKm} km</td>
-                <td className="p-4 font-bold text-emerald-700">
-                  {v1.maxRangeKm >= v2.maxRangeKm ? v1.name : v2.name}
-                </td>
-              </tr>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs font-bold">
+          <div className="space-y-3">
+            <h3 className="text-lg font-bold text-blue-400">{vehicleA.name} Advantages</h3>
+            <ul className="space-y-2 text-slate-300">
+              {vehicleA.maxRangeKm >= vehicleB.maxRangeKm && (
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>Longer WLTP Range ({vehicleA.maxRangeKm} km vs {vehicleB.maxRangeKm} km)</span>
+                </li>
+              )}
+              {varA.batteryCapacityKwh >= varB.batteryCapacityKwh && (
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>Larger Battery Pack ({varA.batteryCapacityKwh} kWh vs {varB.batteryCapacityKwh} kWh)</span>
+                </li>
+              )}
+              {vehicleA.startingPricePkr <= vehicleB.startingPricePkr && (
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>Lower Starting Price ({formatPkr(vehicleA.startingPricePkr)})</span>
+                </li>
+              )}
+            </ul>
+          </div>
 
-              <tr>
-                <td className="p-4 font-bold text-slate-700 bg-slate-50">Battery Capacity</td>
-                <td className="p-4">{v1Variant.batteryCapacityKwh} kWh</td>
-                <td className="p-4">{v2Variant.batteryCapacityKwh} kWh</td>
-                <td className="p-4 font-bold text-emerald-700">
-                  {v1Variant.batteryCapacityKwh >= v2Variant.batteryCapacityKwh ? v1.name : v2.name}
-                </td>
-              </tr>
-
-              <tr>
-                <td className="p-4 font-bold text-slate-700 bg-slate-50">DC Fast Charge Speed</td>
-                <td className="p-4">{v1Variant.fastChargeKw} kW ({v1Variant.fastChargeTimeMin} min)</td>
-                <td className="p-4">{v2Variant.fastChargeKw} kW ({v2Variant.fastChargeTimeMin} min)</td>
-                <td className="p-4 font-bold text-emerald-700">
-                  {v1Variant.fastChargeKw >= v2Variant.fastChargeKw ? v1.name : v2.name}
-                </td>
-              </tr>
-
-              <tr>
-                <td className="p-4 font-bold text-slate-700 bg-slate-50">Motor Output & Torque</td>
-                <td className="p-4">{v1Variant.motorPowerHp} HP / {v1Variant.motorTorqueNm} Nm</td>
-                <td className="p-4">{v2Variant.motorPowerHp} HP / {v2Variant.motorTorqueNm} Nm</td>
-                <td className="p-4 font-bold text-emerald-700">
-                  {v1Variant.motorPowerHp >= v2Variant.motorPowerHp ? v1.name : v2.name}
-                </td>
-              </tr>
-
-              <tr>
-                <td className="p-4 font-bold text-slate-700 bg-slate-50">PakevFinder Score</td>
-                <td className="p-4 font-black text-sm text-blue-700">{scores.vehicle1.overallScore}/10</td>
-                <td className="p-4 font-black text-sm text-blue-700">{scores.vehicle2.overallScore}/10</td>
-                <td className="p-4 font-bold text-emerald-700">
-                  {scores.winnerOverall === 1 ? v1.name : v2.name}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div className="space-y-3">
+            <h3 className="text-lg font-bold text-cyan-400">{vehicleB.name} Advantages</h3>
+            <ul className="space-y-2 text-slate-300">
+              {vehicleB.maxRangeKm > vehicleA.maxRangeKm && (
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>Longer WLTP Range ({vehicleB.maxRangeKm} km vs {vehicleA.maxRangeKm} km)</span>
+                </li>
+              )}
+              {varB.fastChargeKw >= varA.fastChargeKw && (
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>Faster Peak DC Charging ({varB.fastChargeKw} kW vs {varA.fastChargeKw} kW)</span>
+                </li>
+              )}
+              {vehicleB.startingPricePkr < vehicleA.startingPricePkr && (
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>Lower Starting Price ({formatPkr(vehicleB.startingPricePkr)})</span>
+                </li>
+              )}
+            </ul>
+          </div>
         </div>
       </div>
     </div>
