@@ -7,6 +7,7 @@ import SchemaScript, {
 } from '@/components/seo/SchemaScript';
 import VehicleFallbackImage from '@/components/vehicles/VehicleFallbackImage';
 import VehicleRunningCostCalculator from '@/components/vehicles/VehicleRunningCostCalculator';
+import RangeCalculator from '@/components/vehicles/RangeCalculator';
 import { getVehicleBySlug, getAllVehicles } from '@/lib/data/mock-db';
 import { getVerificationBadgeConfig } from '@/lib/data/verification';
 import { calculateVehicleScore } from '@/lib/calculations/scoring';
@@ -20,9 +21,9 @@ import {
   Calendar,
   Sparkles,
   ShieldCheck,
-  Radio,
   Plug,
   Award,
+  ArrowRight,
   CheckCircle2,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -83,62 +84,63 @@ export default async function VehicleSlugPage({ params }: VehicleSlugPageProps) 
       />
 
       {/* Main Hero Card */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm">
-        <div className="lg:col-span-7 space-y-4">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="bg-slate-900 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl">
+        <div className="lg:col-span-7 space-y-5">
+          <div className="flex items-center gap-2 flex-wrap text-xs font-bold">
+            <span className="bg-slate-950 text-white border border-slate-800 px-3 py-1 rounded-full uppercase tracking-wider text-[10px]">
               {vehicle.bodyType} • {vehicle.powertrain || 'EV'}
             </span>
 
             {/* Verification Status Badge */}
-            <span
-              className={`text-xs font-bold px-3 py-1 rounded-full border flex items-center gap-1.5 ${verificationConfig.badgeClass}`}
-            >
-              <ShieldCheck className={`w-3.5 h-3.5 ${verificationConfig.iconColorClass}`} />
+            <span className={`text-[10px] px-3 py-1 rounded-full border flex items-center gap-1.5 ${verificationConfig.badgeClass}`}>
+              <ShieldCheck className="w-3.5 h-3.5" />
               {verificationConfig.label}
             </span>
 
-            <span className="bg-slate-100 text-slate-700 text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1">
-              <Calendar className="w-3.5 h-3.5 text-slate-500" />
+            <span className="bg-slate-800 text-slate-300 px-3 py-1 rounded-full text-[10px] flex items-center gap-1">
+              <Calendar className="w-3.5 h-3.5 text-slate-400" />
               Verified {vehicle.verifiedDate || 'Feb 2026'}
             </span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 leading-tight">
-            {vehicle.name} Specs, Price & Range
-          </h1>
+          <div>
+            <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block">{vehicle.brandName}</span>
+            <h1 className="text-3xl sm:text-5xl font-black text-white leading-tight">
+              {vehicle.name} Specs, Price & Range
+            </h1>
+          </div>
 
-          <p className="text-slate-600 text-sm leading-relaxed font-medium">
+          <p className="text-slate-300 text-sm leading-relaxed font-medium">
             {vehicle.description}
           </p>
 
           <div className="pt-2 flex items-baseline gap-3">
-            <span className="text-slate-500 text-xs font-semibold">Ex-Factory Starting Price:</span>
-            <span className="text-3xl font-black text-blue-700">
+            <span className="text-slate-400 text-xs font-bold">Ex-Factory Price:</span>
+            <span className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">
               {vehicle.startingPricePkr > 0 ? formatPkr(vehicle.startingPricePkr) : 'Upcoming / Expected'}
             </span>
           </div>
 
           {/* Action CTAs */}
-          <div className="pt-4 flex flex-wrap gap-3">
+          <div className="pt-2 flex flex-wrap gap-3">
             <Link
               href={`/compare/${vehicle.slug}-vs-byd-seal`}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-3 px-5 rounded-xl transition-all shadow-sm flex items-center gap-1.5"
+              className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs py-3.5 px-6 rounded-xl transition-all shadow-lg shadow-blue-600/20 flex items-center gap-2"
             >
-              <Sparkles className="w-4 h-4" />
-              Compare {vehicle.name} &rarr;
+              <Sparkles className="w-4 h-4 text-amber-300" />
+              <span>Compare {vehicle.name}</span>
             </Link>
             <Link
-              href="/plan-a-route"
-              className="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs py-3 px-5 rounded-xl transition-all border border-slate-200 flex items-center gap-1.5"
+              href="/compare"
+              className="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs py-3.5 px-6 rounded-xl transition-all border border-slate-700 flex items-center gap-2"
             >
-              Plan Intercity Route
+              Select Competitor
             </Link>
           </div>
         </div>
 
         {/* Vehicle Image */}
-        <div className="lg:col-span-5 relative aspect-video w-full rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shadow-sm">
+        <div className="lg:col-span-5 relative aspect-video w-full rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 shadow-xl">
           <VehicleFallbackImage
             src={vehicle.imageUrl}
             alt={`${vehicle.brandName} ${vehicle.name} Electric Vehicle`}
@@ -163,100 +165,67 @@ export default async function VehicleSlugPage({ params }: VehicleSlugPageProps) 
         sourceName={`${vehicle.distributorName} Verified Specifications`}
       />
 
-      {/* Highlights KPI Cards */}
+      {/* KPI Specs Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white border border-slate-200 p-5 rounded-2xl text-center shadow-sm">
-          <Battery className="w-6 h-6 text-emerald-600 mx-auto mb-2" />
-          <span className="text-xl font-bold text-slate-900 block">{vehicle.maxRangeKm} km</span>
-          <span className="text-xs text-slate-500">WLTP / NEDC Range</span>
+        <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl text-center shadow-md">
+          <Battery className="w-6 h-6 text-emerald-400 mx-auto mb-2" />
+          <span className="text-xl font-black text-white block">{vehicle.maxRangeKm} km</span>
+          <span className="text-xs text-slate-400 font-medium">WLTP Range</span>
         </div>
 
-        <div className="bg-white border border-slate-200 p-5 rounded-2xl text-center shadow-sm">
-          <Zap className="w-6 h-6 text-amber-500 mx-auto mb-2" />
-          <span className="text-xl font-bold text-slate-900 block">{defaultVariant.batteryCapacityKwh} kWh</span>
-          <span className="text-xs text-slate-500">Battery Pack Size</span>
+        <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl text-center shadow-md">
+          <Zap className="w-6 h-6 text-amber-400 mx-auto mb-2" />
+          <span className="text-xl font-black text-white block">{defaultVariant.batteryCapacityKwh} kWh</span>
+          <span className="text-xs text-slate-400 font-medium">Battery Pack</span>
         </div>
 
-        <div className="bg-white border border-slate-200 p-5 rounded-2xl text-center shadow-sm">
-          <Gauge className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-          <span className="text-xl font-bold text-slate-900 block">
-            {defaultVariant.motorPowerHp} HP / {defaultVariant.motorTorqueNm} Nm
+        <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl text-center shadow-md">
+          <Gauge className="w-6 h-6 text-blue-400 mx-auto mb-2" />
+          <span className="text-xl font-black text-white block">
+            {defaultVariant.motorPowerHp} HP
           </span>
-          <span className="text-xs text-slate-500">Motor Output & Torque</span>
+          <span className="text-xs text-slate-400 font-medium">{defaultVariant.motorTorqueNm} Nm Torque</span>
         </div>
 
-        <div className="bg-white border border-slate-200 p-5 rounded-2xl text-center shadow-sm">
-          <Clock className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-          <span className="text-xl font-bold text-slate-900 block">{defaultVariant.fastChargeTimeMin} min</span>
-          <span className="text-xs text-slate-500">10-80% DC Fast Charge</span>
+        <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl text-center shadow-md">
+          <Clock className="w-6 h-6 text-cyan-400 mx-auto mb-2" />
+          <span className="text-xl font-black text-white block">{defaultVariant.fastChargeTimeMin} min</span>
+          <span className="text-xs text-slate-400 font-medium">10-80% DC Fast Charge</span>
         </div>
       </div>
 
       {/* Value Scoring Breakdown */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
+        <div className="flex items-center justify-between border-b border-slate-800 pb-4 flex-wrap gap-4">
           <div className="flex items-center gap-2">
-            <Award className="w-6 h-6 text-blue-600" />
-            <h2 className="text-2xl font-bold text-slate-900">PakevFinder Value Score Index</h2>
+            <Award className="w-6 h-6 text-blue-400" />
+            <h2 className="text-2xl font-bold text-white">PakevFinder Value Score Index</h2>
           </div>
-          <span className="bg-blue-600 text-white font-black text-lg px-4 py-1.5 rounded-2xl">
+          <span className="bg-gradient-to-r from-blue-600 to-emerald-600 text-white font-black text-lg px-4 py-1.5 rounded-2xl shadow-lg">
             {scores.overallScore} / 10
           </span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {Object.values(scores.categoryScores).map((cs, idx) => (
-            <div key={idx} className="bg-slate-50 border border-slate-200 p-4 rounded-2xl space-y-1">
-              <div className="flex justify-between items-center text-xs font-bold text-slate-700">
+            <div key={idx} className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-1">
+              <div className="flex justify-between items-center text-xs font-bold text-slate-300">
                 <span>{cs.category}</span>
-                <span className="text-blue-700 font-extrabold">{cs.score}/10</span>
+                <span className="text-blue-400 font-extrabold">{cs.score}/10</span>
               </div>
-              <span className="text-sm font-bold text-slate-900 block">{cs.label}</span>
-              <p className="text-[11px] text-slate-500 leading-relaxed">{cs.explanation}</p>
+              <span className="text-sm font-bold text-white block">{cs.label}</span>
+              <p className="text-[11px] text-slate-400 leading-relaxed">{cs.explanation}</p>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Charging Specs & Compatibility */}
-      <div className="bg-slate-900 text-white rounded-3xl p-6 sm:p-8 space-y-6 shadow-md">
-        <div className="flex items-center gap-2 border-b border-slate-800 pb-4">
-          <Plug className="w-6 h-6 text-emerald-400" />
-          <h2 className="text-2xl font-bold">Charging Ports & Public Network Compatibility</h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-slate-800 p-5 rounded-2xl border border-slate-700 space-y-2">
-            <span className="text-xs text-slate-400 font-semibold uppercase block">AC Home Charger Port</span>
-            <span className="text-lg font-bold text-white block">
-              {defaultVariant.acChargerType || 'Type 2 - 11 kW'}
-            </span>
-            <span className="text-xs text-slate-300 block">
-              Max AC Power: {defaultVariant.acChargeKw} kW (~{defaultVariant.acChargeTimeHours} hrs full)
-            </span>
-          </div>
-
-          <div className="bg-slate-800 p-5 rounded-2xl border border-slate-700 space-y-2">
-            <span className="text-xs text-slate-400 font-semibold uppercase block">DC Fast Charge Port</span>
-            <span className="text-lg font-bold text-emerald-400 block">
-              {defaultVariant.dcChargerType || `CCS2 - ${defaultVariant.fastChargeKw} kW`}
-            </span>
-            <span className="text-xs text-slate-300 block">
-              10-80% Charge: {defaultVariant.fastChargeTimeMin} mins @ {defaultVariant.fastChargeKw} kW
-            </span>
-          </div>
-
-          <div className="bg-slate-800 p-5 rounded-2xl border border-slate-700 space-y-2">
-            <span className="text-xs text-slate-400 font-semibold uppercase block">Public Network Coverage</span>
-            <span className="text-lg font-bold text-blue-400 block">
-              {defaultVariant.networkCoverageRatio || '101/105 stations - 96% compatibility'}
-            </span>
-            <span className="text-xs text-slate-300 block">
-              Compatible across Motorway M2, Karachi, Lahore & Islamabad
-            </span>
-          </div>
-        </div>
-      </div>
+      {/* Interactive Range Estimator */}
+      <RangeCalculator
+        vehicleName={vehicle.name}
+        claimedWltpRangeKm={vehicle.maxRangeKm}
+        batteryCapacityKwh={defaultVariant.batteryCapacityKwh}
+      />
 
       {/* Interactive Running Cost Calculator */}
       <VehicleRunningCostCalculator
@@ -266,36 +235,36 @@ export default async function VehicleSlugPage({ params }: VehicleSlugPageProps) 
       />
 
       {/* Specifications Table */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm">
-        <div className="flex items-center gap-2 border-b border-slate-100 pb-4">
-          <FileSpreadsheet className="w-6 h-6 text-blue-600" />
-          <h2 className="text-2xl font-bold text-slate-900">Technical Specifications Breakdown</h2>
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
+        <div className="flex items-center gap-2 border-b border-slate-800 pb-4">
+          <FileSpreadsheet className="w-6 h-6 text-blue-400" />
+          <h2 className="text-2xl font-bold text-white">Technical Specifications Breakdown</h2>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-200 text-slate-700 uppercase font-bold">
+              <tr className="bg-slate-950 border-b border-slate-800 text-slate-400 uppercase font-bold">
                 <th className="p-4">Spec Feature</th>
                 {vehicle.variants.map((v) => (
-                  <th key={v.id} className="p-4 text-blue-700 font-bold text-sm">
+                  <th key={v.id} className="p-4 text-blue-400 font-bold text-sm">
                     {v.name}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200 text-slate-800">
+            <tbody className="divide-y divide-slate-800 text-slate-200">
               <tr>
-                <td className="p-4 font-bold text-slate-700 bg-slate-50">Ex-Factory Price</td>
+                <td className="p-4 font-bold text-slate-400 bg-slate-950">Ex-Factory Price</td>
                 {vehicle.variants.map((v) => (
-                  <td key={v.id} className="p-4 font-black text-sm text-blue-700">
+                  <td key={v.id} className="p-4 font-black text-sm text-emerald-400">
                     {v.pricePkr > 0 ? formatPkr(v.pricePkr) : 'Expected'}
                   </td>
                 ))}
               </tr>
 
               <tr>
-                <td className="p-4 font-bold text-slate-700 bg-slate-50">Battery Capacity</td>
+                <td className="p-4 font-bold text-slate-400 bg-slate-950">Battery Capacity</td>
                 {vehicle.variants.map((v) => (
                   <td key={v.id} className="p-4 font-medium">
                     {v.batteryCapacityKwh} kWh Usable
@@ -304,7 +273,7 @@ export default async function VehicleSlugPage({ params }: VehicleSlugPageProps) 
               </tr>
 
               <tr>
-                <td className="p-4 font-bold text-slate-700 bg-slate-50">Claimed Range</td>
+                <td className="p-4 font-bold text-slate-400 bg-slate-950">Claimed Range</td>
                 {vehicle.variants.map((v) => (
                   <td key={v.id} className="p-4 font-medium">
                     {v.wltpRangeKm ? `${v.wltpRangeKm} km WLTP` : `${v.nedcRangeKm} km NEDC`}
@@ -313,7 +282,7 @@ export default async function VehicleSlugPage({ params }: VehicleSlugPageProps) 
               </tr>
 
               <tr>
-                <td className="p-4 font-bold text-slate-700 bg-slate-50">Motor Power & Torque</td>
+                <td className="p-4 font-bold text-slate-400 bg-slate-950">Motor Output & Torque</td>
                 {vehicle.variants.map((v) => (
                   <td key={v.id} className="p-4 font-medium">
                     {v.motorPowerHp} HP / {v.motorTorqueNm} Nm ({v.driveType})
@@ -322,9 +291,9 @@ export default async function VehicleSlugPage({ params }: VehicleSlugPageProps) 
               </tr>
 
               <tr>
-                <td className="p-4 font-bold text-slate-700 bg-slate-50">Warranty Coverage</td>
+                <td className="p-4 font-bold text-slate-400 bg-slate-950">Warranty Coverage</td>
                 {vehicle.variants.map((v) => (
-                  <td key={v.id} className="p-4 font-semibold text-emerald-700">
+                  <td key={v.id} className="p-4 font-semibold text-emerald-400">
                     {v.warrantyYears} Years Vehicle / {v.batteryWarrantyYears} Years Battery
                   </td>
                 ))}
