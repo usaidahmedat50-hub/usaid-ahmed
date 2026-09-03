@@ -1,3 +1,5 @@
+const path = require('path');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
@@ -9,6 +11,9 @@ const nextConfig = {
         hostname: '**',
       },
     ],
+  },
+  turbopack: {
+    root: path.join(__dirname, '..'),
   },
 };
 
