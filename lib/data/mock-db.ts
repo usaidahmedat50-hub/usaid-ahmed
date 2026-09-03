@@ -338,3 +338,72 @@ export function getBrandBySlug(slug: string): MockBrand | undefined {
 export function getAllFaqs(): MockFaq[] {
   return FAQS;
 }
+
+export interface MockChargingStation {
+  id: string;
+  name: string;
+  operator: string;
+  cityName: string;
+  citySlug: string;
+  address: string;
+  connectors: string[];
+  powerKw: number;
+  pricePerKwh: number;
+  status: string;
+}
+
+export const CHARGING_STATIONS: MockChargingStation[] = [
+  {
+    id: 'cs-1',
+    name: 'BYD Mega Motors Fast Charging Hub',
+    operator: 'Hubco Green / BYD',
+    cityName: 'Karachi',
+    citySlug: 'karachi',
+    address: 'Shahrah-e-Faisal, Near Nursery',
+    connectors: ['CCS2', 'GB/T'],
+    powerKw: 120,
+    pricePerKwh: 85,
+    status: 'Verified Active',
+  },
+  {
+    id: 'cs-2',
+    name: 'Deepal Master Motors 3S Charging Station',
+    operator: 'Master Motors',
+    cityName: 'Lahore',
+    citySlug: 'lahore',
+    address: 'Main Boulevard Gulberg III',
+    connectors: ['CCS2', 'Type 2'],
+    powerKw: 100,
+    pricePerKwh: 80,
+    status: 'Verified Active',
+  },
+  {
+    id: 'cs-3',
+    name: 'Bera Motorway M-2 Fast Charger',
+    operator: 'FWO / Hubco Green',
+    cityName: 'Motorway M-2',
+    citySlug: 'islamabad',
+    address: 'Bera Rest Area (Northbound)',
+    connectors: ['CCS2', 'GB/T'],
+    powerKw: 180,
+    pricePerKwh: 95,
+    status: 'Verified Active',
+  },
+  {
+    id: 'cs-4',
+    name: 'MG Capital DC Fast Charger',
+    operator: 'MG Pakistan',
+    cityName: 'Islamabad',
+    citySlug: 'islamabad',
+    address: 'Blue Area, Jinnah Avenue',
+    connectors: ['CCS2'],
+    powerKw: 60,
+    pricePerKwh: 75,
+    status: 'Verified Active',
+  },
+];
+
+export function getAllChargingStations(): MockChargingStation[] {
+  return CHARGING_STATIONS;
+}
+
