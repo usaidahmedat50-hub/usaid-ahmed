@@ -1,0 +1,438 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// -----------------------------------------------------------------------------
+// International Architecture: Country & Market
+// -----------------------------------------------------------------------------
+
+model Country {
+  id           String   @id @default(uuid())
+  code         String   @unique // e.g. "PK", "SA", "AE", "UK"
+  name         String
+  currencyCode String   // e.g. "PKR", "SAR", "AED", "GBP"
+  currencySymbol String // e.g. "PKR", "SR", "AED", "£"
+  unitSystem   String   @default("metric") // metric or imperial
+  flagEmoji    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  markets         Market[]
+  prices          Price[]
+  priceHistories  PriceHistory[]
+  chargingStations ChargingStation[]
+
+  @@map("countries")
+}
+
+model Market {
+  id          String   @id @default(uuid())
+  countryId   String
+  name        String   // e.g. "Pakistan Official Market"
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  country           Country            @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  financingProducts FinancingProduct[]
+
+  @@map("markets")
+}
+
+// -----------------------------------------------------------------------------
+// Core Vehicle Entities
+// -----------------------------------------------------------------------------
+
+model Brand {
+  id                  String   @id @default(uuid())
+  name                String
+  slug                String   @unique
+  logoUrl             String?
+  countryOfOrigin     String?
+  officialDistributor String?
+  websiteUrl          String?
+  description         String?  @db.Text
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  vehicles Vehicle[]
+
+  @@map("brands")
+}
+
+model Vehicle {
+  id              String   @id @default(uuid())
+  brandId         String
+  name            String   // e.g. "BYD Seal", "MG4 EV"
+  slug            String   @unique
+  bodyType        String   // SUV, Sedan, Hatchback, Crossover, MPV, Microcar, Pickup, Fastback, Convertible
+  powertrain      String?  // bev, phev, reev, hybrid, ice, fcev, other (Nullable, no default BEV)
+  tagline         String?
+  description     String   @db.Text
+  startingPricePkr Float   @default(0)
+  maxRangeKm      Int      @default(0)
+  topSpeedKmh     Int      @default(0)
+  accelerationSec Float    @default(0)
+  isUpcoming      Boolean  @default(false)
+  isFeatured      Boolean  @default(false)
+  imageUrl        String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  brand          Brand                  @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  models         VehicleModel[]
+  variants       VehicleVariant[]
+  images         VehicleImage[]
+  sources        VehicleSource[]
+  verifications  VerificationRecord[]
+  prices         Price[]
+  priceHistories PriceHistory[]
+
+  @@map("vehicles")
+}
+
+model VehicleModel {
+  id          String   @id @default(uuid())
+  vehicleId   String
+  name        String   // e.g. "Seal 2026 Model Year"
+  slug        String   @unique
+  releaseYear Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  vehicle  Vehicle          @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  variants VehicleVariant[]
+
+  @@map("vehicle_models")
+}
+
+model VehicleVariant {
+  id             String   @id @default(uuid())
+  vehicleId      String
+  modelId        String?
+  name           String   // e.g. "BYD Seal Excellence AWD"
+  slug           String   @unique
+  pricePkr       Float
+  status         String   @default("verified") // verified, partially_verified, unverified, outdated
+  confidence     Float    @default(1.0)
+  source         String?
+  sourceUrl      String?
+  lastVerifiedAt DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  vehicle               Vehicle                @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  model                 VehicleModel?          @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  specification         VehicleSpecification?
+  batterySpecification  BatterySpecification?
+  chargingSpecification ChargingSpecification?
+  rangeSpecification    RangeSpecification?
+  features              VehicleFeature[]
+  prices                Price[]
+  priceHistories        PriceHistory[]
+
+  @@map("vehicle_variants")
+}
+
+// -----------------------------------------------------------------------------
+// Detailed Technical Specifications
+// -----------------------------------------------------------------------------
+
+model VehicleSpecification {
+  id                String   @id @default(uuid())
+  variantId         String   @unique
+  motorPowerHp      Int
+  motorTorqueNm     Int
+  driveType         String   // FWD, RWD, AWD
+  seatingCapacity   Int      @default(5)
+  groundClearanceMm Int      @default(150)
+  bootSpaceLiters   Int      @default(400)
+  kerbWeightKg      Int      @default(1600)
+  dimensionsMm      String?  // e.g. "4800 x 1875 x 1460 mm"
+  warrantyYears     Int      @default(5)
+  batteryWarrantyYears Int   @default(8)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  variant VehicleVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@map("vehicle_specifications")
+}
+
+model BatterySpecification {
+  id                 String   @id @default(uuid())
+  variantId          String   @unique
+  capacityKwh        Float
+  usableCapacityKwh  Float
+  chemistry          String?  // e.g. "LFP Blade", "NMC"
+  voltage            Int      @default(400)
+  thermalManagement  String?  // e.g. "Liquid Cooled"
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  variant VehicleVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@map("battery_specifications")
+}
+
+model ChargingSpecification {
+  id                   String   @id @default(uuid())
+  variantId            String   @unique
+  acChargerType        String   // e.g. "Type 2 - 11 kW"
+  dcChargerType        String   // e.g. "CCS2 - 150 kW"
+  maxAcKw              Float    @default(11)
+  maxDcKw              Float    @default(150)
+  dcChargeTimeMin      Int      @default(30) // 10% to 80%
+  acChargeTimeHours    Float    @default(7)
+  networkCoverageRatio String?  // e.g. "101/105 stations - 96% compatibility"
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  variant VehicleVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@map("charging_specifications")
+}
+
+model RangeSpecification {
+  id                  String   @id @default(uuid())
+  variantId           String   @unique
+  wltpRangeKm         Int?
+  nedcRangeKm         Int?
+  realWorldEstRangeKm Int?
+  consumptionKwh100km Float    @default(15.0)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  variant VehicleVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@map("range_specifications")
+}
+
+model VehicleFeature {
+  id        String   @id @default(uuid())
+  variantId String
+  category  String   // Safety, Comfort, Infotainment, ADAS
+  featureName String
+  isStandard Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  variant VehicleVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@map("vehicle_features")
+}
+
+model VehicleImage {
+  id           String   @id @default(uuid())
+  vehicleId    String
+  imageUrl     String
+  altText      String
+  isPrimary    Boolean  @default(false)
+  copyrightInfo String?
+  createdAt    DateTime @default(now())
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@map("vehicle_images")
+}
+
+// -----------------------------------------------------------------------------
+// Data Quality, Sources & Verification Tracking
+// -----------------------------------------------------------------------------
+
+model VehicleSource {
+  id          String   @id @default(uuid())
+  vehicleId   String
+  sourceName  String   // e.g. "BYD Pakistan Official Tariff", "AutoShow Press Release"
+  sourceUrl   String?
+  sourceType  String   // official, press_release, dealer, public
+  createdAt   DateTime @default(now())
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@map("vehicle_sources")
+}
+
+model VerificationRecord {
+  id             String   @id @default(uuid())
+  vehicleId      String
+  status         String   // verified, partially_verified, unverified, outdated
+  confidence     Float    @default(1.0)
+  notes          String?  @db.Text
+  verifiedBy     String?
+  lastVerifiedAt DateTime @default(now())
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@map("verification_records")
+}
+
+// -----------------------------------------------------------------------------
+// Price & Historical Price Management
+// -----------------------------------------------------------------------------
+
+model Price {
+  id             String   @id @default(uuid())
+  vehicleId      String
+  variantId      String?
+  countryId      String
+  amount         Float
+  currency       String   @default("PKR")
+  priceType      String   @default("EX_FACTORY") // EX_FACTORY, ON_ROAD, LISTED
+  isActive       Boolean  @default(true)
+  status         String   @default("verified")
+  lastVerifiedAt DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  vehicle Vehicle         @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  variant VehicleVariant? @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  country Country        @relation(fields: [countryId], references: [id], onDelete: Cascade)
+
+  @@map("prices")
+}
+
+model PriceHistory {
+  id             String   @id @default(uuid())
+  vehicleId      String
+  variantId      String?
+  countryId      String
+  amount         Float
+  currency       String   @default("PKR")
+  priceType      String   @default("EX_FACTORY")
+  effectiveDate  DateTime @default(now())
+  source         String?
+  status         String   @default("verified")
+  createdAt      DateTime @default(now())
+
+  vehicle Vehicle         @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  variant VehicleVariant? @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  country Country        @relation(fields: [countryId], references: [id], onDelete: Cascade)
+
+  @@map("price_histories")
+}
+
+// -----------------------------------------------------------------------------
+// Financing Architecture
+// -----------------------------------------------------------------------------
+
+model FinancingProduct {
+  id           String   @id @default(uuid())
+  marketId     String
+  bankName     String   // e.g. "Meezan Bank Car Ijarah", "Bank Alfalah EV Finance"
+  productName  String
+  downPaymentPercent Float @default(20)
+  maxTenureYears     Int   @default(5)
+  status       String   @default("verified")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  market Market                 @relation(fields: [marketId], references: [id], onDelete: Cascade)
+  rates  FinancingRateHistory[]
+
+  @@map("financing_products")
+}
+
+model FinancingRateHistory {
+  id          String    @id @default(uuid())
+  productId   String
+  baseRate    Float     // e.g. KIBOR 12.5%
+  spread      Float     // e.g. 2.5%
+  totalRate   Float     // e.g. 15.0%
+  effectiveDate DateTime @default(now())
+  expiryDate  DateTime?
+  source      String?
+  status      String    @default("verified")
+  createdAt   DateTime  @default(now())
+
+  product FinancingProduct @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("financing_rate_histories")
+}
+
+// -----------------------------------------------------------------------------
+// Infrastructure & Content Entities
+// -----------------------------------------------------------------------------
+
+model Dealer {
+  id          String   @id @default(uuid())
+  name        String
+  city        String
+  address     String
+  phone       String?
+  latitude    Float?
+  longitude   Float?
+  isOfficial  Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  @@map("dealers")
+}
+
+model ChargingStation {
+  id                String   @id @default(uuid())
+  countryId         String?
+  name              String
+  operator          String
+  city              String
+  locationName      String
+  latitude          Float
+  longitude         Float
+  address           String
+  totalPorts        Int      @default(2)
+  ccs2Ports         Int      @default(1)
+  gbtPorts          Int      @default(0)
+  type2Ports        Int      @default(1)
+  maxPowerKw        Float    @default(60)
+  isFastCharger     Boolean  @default(true)
+  pricingPerUnitPkr Float    @default(80)
+  operationalHours  String   @default("24/7")
+  googleMapsUrl     String?
+  status            String   @default("verified")
+  createdAt         DateTime @default(now())
+
+  country Country? @relation(fields: [countryId], references: [id], onDelete: SetNull)
+
+  @@map("charging_stations")
+}
+
+model Article {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  description String
+  content     String   @db.Text
+  imageUrl    String?
+  category    String   // Guides, Comparison, Policy, Market
+  author      String   @default("PakevFinder Editorial")
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("articles")
+}
+
+model FAQ {
+  id        String   @id @default(uuid())
+  category  String   // Charging, Buying, Range, Battery, Policy
+  question  String
+  answer    String   @db.Text
+  slug      String   @unique
+  createdAt DateTime @default(now())
+
+  @@map("faqs")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  role      String   @default("user") // user, admin
+  createdAt DateTime @default(now())
+
+  @@map("users")
+}

@@ -1,0 +1,21 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# build outputs
+/.next/
+/out/
+/release_dist/
+deploy.zip
+*.zip
+
+# logs & env
+*.log
+.env
+.env*.local
+
+# IDE & system files
+.DS_Store
+.vscode
+.idea

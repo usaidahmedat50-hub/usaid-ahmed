@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <defs>
+    <linearGradient id="attoBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="attoAccent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="450" fill="url(#attoBg)"/>
+  
+  <!-- High-contrast SUV Silhouette -->
+  <g transform="translate(150, 110)">
+    <!-- Cabin Shadow & Windows -->
+    <path d="M 120 120 L 180 50 L 330 50 L 400 120 Z" fill="#38bdf8" opacity="0.3"/>
+    
+    <!-- Body Lines -->
+    <path d="M 30 140 C 40 100 110 50 190 45 C 280 40 370 50 440 110 L 480 130 C 500 140 505 160 480 170 C 440 175 60 175 20 170 C 5 165 10 145 30 140 Z" fill="url(#attoAccent)"/>
+    
+    <!-- Headlights & Taillights -->
+    <polygon points="460,125 490,135 460,145" fill="#e0f2fe"/>
+    <polygon points="20,135 40,130 35,145" fill="#ef4444"/>
+    
+    <!-- Wheels -->
+    <circle cx="120" cy="170" r="38" fill="#020617" stroke="#38bdf8" stroke-width="4"/>
+    <circle cx="120" cy="170" r="18" fill="#94a3b8"/>
+    
+    <circle cx="390" cy="170" r="38" fill="#020617" stroke="#38bdf8" stroke-width="4"/>
+    <circle cx="390" cy="170" r="18" fill="#94a3b8"/>
+    
+    <!-- EV Lightning Symbol -->
+    <polygon points="255,70 245,100 260,100 248,130 275,92 260,92" fill="#10b981"/>
+  </g>
+
+  <!-- Typography -->
+  <text x="400" y="340" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="900" fill="#ffffff" letter-spacing="1">BYD ATTO 3 (Mega Motor)</text>
+  <text x="400" y="375" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="700" fill="#38bdf8" letter-spacing="2">COMPACT ELECTRIC SUV • PAKISTAN</text>
+</svg>
