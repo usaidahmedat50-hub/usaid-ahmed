@@ -2,10 +2,11 @@ import React from 'react';
 import Link from 'next/link';
 import '@/app/globals.css';
 import Navbar from '@/components/layout/Navbar';
+import StickyCompareTray from '@/components/comparison/StickyCompareTray';
 import { Zap, ShieldCheck } from 'lucide-react';
 
 export const metadata = {
-  title: 'PakevFinder — Electric Vehicle Specifications, Prices & Comparison',
+  title: 'PakevFinder — Pakistan EV & Vehicle Discovery Platform',
   description: 'Pakistan premier automotive intelligence platform for electric vehicles, plug-in hybrids, battery capacity, range specs, and side-by-side comparison.',
   icons: {
     icon: '/favicon.ico',
@@ -28,6 +29,9 @@ export default function RootLayout({
         {/* Main Content Container */}
         <main className="flex-1">{children}</main>
 
+        {/* Global Sticky Comparison Tray */}
+        <StickyCompareTray />
+
         {/* Footer */}
         <footer className="bg-slate-950 border-t border-slate-800/80 mt-20 text-slate-400 text-xs">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
@@ -45,24 +49,27 @@ export default function RootLayout({
               </div>
 
               <div className="space-y-2">
-                <span className="font-bold text-white uppercase tracking-wider block mb-1">Directory</span>
-                <Link href="/vehicles" className="text-slate-400 hover:text-white block transition-colors">All Electric Vehicles</Link>
-                <Link href="/brands" className="text-slate-400 hover:text-white block transition-colors">Automotive Brands</Link>
-                <Link href="/categories" className="text-slate-400 hover:text-white block transition-colors">Vehicle Categories</Link>
+                <span className="font-bold text-white uppercase tracking-wider block mb-1">Discovery & Tools</span>
+                <Link href="/vehicles" className="text-slate-400 hover:text-white block transition-colors">All Vehicles</Link>
+                <Link href="/find-an-ev" className="text-slate-400 hover:text-white block transition-colors">EV Matchmaker</Link>
                 <Link href="/compare" className="text-slate-400 hover:text-white block transition-colors">Comparison Engine</Link>
+                <Link href="/calculators/total-cost-of-ownership" className="text-slate-400 hover:text-white block transition-colors">TCO Calculator</Link>
               </div>
 
               <div className="space-y-2">
-                <span className="font-bold text-white uppercase tracking-wider block mb-1">Knowledge & Guides</span>
-                <Link href="/articles" className="text-slate-400 hover:text-white block transition-colors">EV Cost Analysis</Link>
-                <Link href="/guides" className="text-slate-400 hover:text-white block transition-colors">Home Charging Setup</Link>
-                <Link href="/faq" className="text-slate-400 hover:text-white block transition-colors">Frequently Asked Questions</Link>
+                <span className="font-bold text-white uppercase tracking-wider block mb-1">Directories & Guides</span>
+                <Link href="/prices" className="text-slate-400 hover:text-white block transition-colors">EV Price Directory</Link>
+                <Link href="/charging-stations" className="text-slate-400 hover:text-white block transition-colors">Charging Stations</Link>
+                <Link href="/ev-policy/pakistan" className="text-slate-400 hover:text-white block transition-colors">Pakistan EV Policy</Link>
+                <Link href="/articles" className="text-slate-400 hover:text-white block transition-colors">EV Buyer Guides</Link>
               </div>
 
               <div className="space-y-2">
-                <span className="font-bold text-white uppercase tracking-wider block mb-1">Data Quality Guarantee</span>
-                <p className="text-slate-400 text-xs leading-relaxed">
-                  All vehicle data is verified against official distributor tariffs and manufacturer filings. Unverified claims are explicitly flagged.
+                <span className="font-bold text-white uppercase tracking-wider block mb-1">Trust & Transparency</span>
+                <Link href="/methodology" className="text-slate-400 hover:text-white block transition-colors">Value Score Methodology</Link>
+                <Link href="/about" className="text-slate-400 hover:text-white block transition-colors">About PakevFinder</Link>
+                <p className="text-slate-400 text-xs leading-relaxed pt-1">
+                  All vehicle data is verified against official manufacturer tariffs. Unverified claims are explicitly flagged.
                 </p>
               </div>
             </div>
